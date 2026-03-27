@@ -5,8 +5,8 @@ import "strings"
 type lexerState int
 
 const (
-	stateTopLevel   lexerState = iota // package, import, gox declarations
-	stateTemplate                     // inside gox body: HTML text, tags, expressions
+	stateTopLevel   lexerState = iota // package, import, func declarations
+	stateTemplate                     // inside func body: HTML text, tags, expressions
 	stateTag                          // inside an open tag: attributes, >, />
 	stateExpression                   // inside {{ }}: reading Go code
 	stateAttrValue                    // after AttrName with =: expects "string" or {{ expr }}
@@ -137,7 +137,7 @@ func (l *Lexer) lexTopLevel() Token {
 		return Token{Type: TokenImportDecl, Value: value, Line: line, Col: col}
 	}
 
-	if l.startsWith("gox ") {
+	if l.startsWith("func ") {
 		return l.lexGoxDecl(line, col)
 	}
 

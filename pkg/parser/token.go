@@ -9,7 +9,7 @@ const (
 	TokenEOF          TokenType = iota
 	TokenPackageDecl            // "package views"
 	TokenImportDecl             // `import "fmt"`
-	TokenGoxDecl                // "gox Hello(name string) {"
+	TokenGoxDecl                // "func Hello(name string) {"
 	TokenHTMLText               // raw text content
 	TokenExprOpen               // "{{"
 	TokenExprClose              // "}}"

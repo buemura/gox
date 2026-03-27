@@ -58,9 +58,9 @@ func TestMultipleImports(t *testing.T) {
 }
 
 func TestGoxDecl(t *testing.T) {
-	input := "gox Hello(name string) {\n}"
+	input := "func Hello(name string) {\n}"
 	assertTokens(t, input, []Token{
-		{Type: TokenGoxDecl, Value: "gox Hello(name string) {"},
+		{Type: TokenGoxDecl, Value: "func Hello(name string) {"},
 		{Type: TokenHTMLText, Value: "\n"},
 		{Type: TokenBraceClose, Value: "}"},
 		{Type: TokenEOF},
@@ -68,9 +68,9 @@ func TestGoxDecl(t *testing.T) {
 }
 
 func TestGoxDeclMultiLineParams(t *testing.T) {
-	input := "gox Hello(\n  name string,\n  age int,\n) {\n}"
+	input := "func Hello(\n  name string,\n  age int,\n) {\n}"
 	assertTokens(t, input, []Token{
-		{Type: TokenGoxDecl, Value: "gox Hello(\n  name string,\n  age int,\n) {"},
+		{Type: TokenGoxDecl, Value: "func Hello(\n  name string,\n  age int,\n) {"},
 		{Type: TokenHTMLText, Value: "\n"},
 		{Type: TokenBraceClose, Value: "}"},
 		{Type: TokenEOF},
@@ -78,9 +78,9 @@ func TestGoxDeclMultiLineParams(t *testing.T) {
 }
 
 func TestSimpleHTMLText(t *testing.T) {
-	input := "gox Hello() {\n  Hello, world!\n}"
+	input := "func Hello() {\n  Hello, world!\n}"
 	assertTokens(t, input, []Token{
-		{Type: TokenGoxDecl, Value: "gox Hello() {"},
+		{Type: TokenGoxDecl, Value: "func Hello() {"},
 		{Type: TokenHTMLText, Value: "\n  Hello, world!\n"},
 		{Type: TokenBraceClose, Value: "}"},
 		{Type: TokenEOF},
@@ -88,7 +88,7 @@ func TestSimpleHTMLText(t *testing.T) {
 }
 
 func TestOpenAndCloseTag(t *testing.T) {
-	input := "gox Hello() {\n<h1>Hello</h1>\n}"
+	input := "func Hello() {\n<h1>Hello</h1>\n}"
 	assertTokens(t, input, []Token{
 		{Type: TokenGoxDecl},
 		{Type: TokenHTMLText, Value: "\n"},
@@ -103,7 +103,7 @@ func TestOpenAndCloseTag(t *testing.T) {
 }
 
 func TestSelfClosingTag(t *testing.T) {
-	input := "gox Hello() {\n<br />\n}"
+	input := "func Hello() {\n<br />\n}"
 	assertTokens(t, input, []Token{
 		{Type: TokenGoxDecl},
 		{Type: TokenHTMLText, Value: "\n"},
@@ -116,7 +116,7 @@ func TestSelfClosingTag(t *testing.T) {
 }
 
 func TestExpressionEscaped(t *testing.T) {
-	input := "gox Hello(name string) {\n<p>{{ name }}</p>\n}"
+	input := "func Hello(name string) {\n<p>{{ name }}</p>\n}"
 	assertTokens(t, input, []Token{
 		{Type: TokenGoxDecl},
 		{Type: TokenHTMLText, Value: "\n"},
@@ -133,7 +133,7 @@ func TestExpressionEscaped(t *testing.T) {
 }
 
 func TestRawExpression(t *testing.T) {
-	input := "gox Hello() {\n<div>{{! rawHTML }}</div>\n}"
+	input := "func Hello() {\n<div>{{! rawHTML }}</div>\n}"
 	assertTokens(t, input, []Token{
 		{Type: TokenGoxDecl},
 		{Type: TokenHTMLText, Value: "\n"},
@@ -150,7 +150,7 @@ func TestRawExpression(t *testing.T) {
 }
 
 func TestStaticAttribute(t *testing.T) {
-	input := `gox Hello() {
+	input := `func Hello() {
 <div class="main">text</div>
 }`
 	assertTokens(t, input, []Token{
@@ -169,7 +169,7 @@ func TestStaticAttribute(t *testing.T) {
 }
 
 func TestDynamicAttribute(t *testing.T) {
-	input := "gox Hello(cls string) {\n<div class={{ cls }}>text</div>\n}"
+	input := "func Hello(cls string) {\n<div class={{ cls }}>text</div>\n}"
 	assertTokens(t, input, []Token{
 		{Type: TokenGoxDecl},
 		{Type: TokenHTMLText, Value: "\n"},
@@ -188,7 +188,7 @@ func TestDynamicAttribute(t *testing.T) {
 }
 
 func TestBooleanAttribute(t *testing.T) {
-	input := "gox Hello() {\n<button disabled>Submit</button>\n}"
+	input := "func Hello() {\n<button disabled>Submit</button>\n}"
 	assertTokens(t, input, []Token{
 		{Type: TokenGoxDecl},
 		{Type: TokenHTMLText, Value: "\n"},
@@ -204,7 +204,7 @@ func TestBooleanAttribute(t *testing.T) {
 }
 
 func TestSpreadAttribute(t *testing.T) {
-	input := "gox Hello() {\n<input {{ attrs... }} />\n}"
+	input := "func Hello() {\n<input {{ attrs... }} />\n}"
 	assertTokens(t, input, []Token{
 		{Type: TokenGoxDecl},
 		{Type: TokenHTMLText, Value: "\n"},
@@ -220,7 +220,7 @@ func TestSpreadAttribute(t *testing.T) {
 }
 
 func TestControlFlowIf(t *testing.T) {
-	input := `gox Hello(isAdmin bool) {
+	input := `func Hello(isAdmin bool) {
 {{ if isAdmin }}
   <span>Admin</span>
 {{ else }}
@@ -258,7 +258,7 @@ func TestControlFlowIf(t *testing.T) {
 }
 
 func TestControlFlowFor(t *testing.T) {
-	input := `gox List(items []string) {
+	input := `func List(items []string) {
 <ul>
   {{ for _, item := range items }}
     <li>{{ item }}</li>
@@ -294,7 +294,7 @@ func TestControlFlowFor(t *testing.T) {
 }
 
 func TestControlFlowSwitch(t *testing.T) {
-	input := `gox Status(status string) {
+	input := `func Status(status string) {
 {{ switch status }}
   {{ case "active" }}
     <span>Active</span>
@@ -337,7 +337,7 @@ func TestControlFlowSwitch(t *testing.T) {
 }
 
 func TestChildren(t *testing.T) {
-	input := `gox Card(title string) {
+	input := `func Card(title string) {
 <div>
   {{ children }}
 </div>
@@ -360,7 +360,7 @@ func TestChildren(t *testing.T) {
 }
 
 func TestComponentCall(t *testing.T) {
-	input := `gox Page() {
+	input := `func Page() {
 <Header />
 <Footer />
 }`
@@ -379,7 +379,7 @@ func TestComponentCall(t *testing.T) {
 }
 
 func TestMultipleAttributes(t *testing.T) {
-	input := `gox Hello() {
+	input := `func Hello() {
 <div id="app" class="main" data-x="1">text</div>
 }`
 	assertTokens(t, input, []Token{
@@ -402,7 +402,7 @@ func TestMultipleAttributes(t *testing.T) {
 }
 
 func TestExpressionWithBraces(t *testing.T) {
-	input := `gox Hello() {
+	input := `func Hello() {
 {{ map[string]int{"a": 1} }}
 }`
 	tokens := tokenize(input)
@@ -419,7 +419,7 @@ func TestExpressionWithBraces(t *testing.T) {
 }
 
 func TestExpressionWithStringContainingBraces(t *testing.T) {
-	input := "gox Hello() {\n{{ fmt.Sprintf(\"}}\") }}\n}"
+	input := "func Hello() {\n{{ fmt.Sprintf(\"}}\") }}\n}"
 	tokens := tokenize(input)
 	for _, tok := range tokens {
 		if tok.Type == TokenGoCode {
@@ -435,11 +435,11 @@ func TestExpressionWithStringContainingBraces(t *testing.T) {
 func TestMultipleComponents(t *testing.T) {
 	input := `package views
 
-gox Hello() {
+func Hello() {
 <h1>Hello</h1>
 }
 
-gox World() {
+func World() {
 <h2>World</h2>
 }`
 	assertTokens(t, input, []Token{
@@ -465,7 +465,7 @@ gox World() {
 }
 
 func TestLineColumnTracking(t *testing.T) {
-	input := "package views\n\ngox Hello() {\n<h1>Hi</h1>\n}"
+	input := "package views\n\nfunc Hello() {\n<h1>Hi</h1>\n}"
 	tokens := tokenize(input)
 
 	// package views is at line 1, col 1
@@ -473,7 +473,7 @@ func TestLineColumnTracking(t *testing.T) {
 		t.Errorf("PackageDecl position: got %d:%d, want 1:1", tokens[0].Line, tokens[0].Col)
 	}
 
-	// gox Hello() { is at line 3
+	// func Hello() { is at line 3
 	if tokens[1].Line != 3 {
 		t.Errorf("GoxDecl line: got %d, want 3", tokens[1].Line)
 	}
@@ -484,13 +484,13 @@ func TestFullComponent(t *testing.T) {
 
 import "fmt"
 
-gox Hello(name string) {
+func Hello(name string) {
   <h1 class="title">Hello, {{ name }}!</h1>
 }`
 	assertTokens(t, input, []Token{
 		{Type: TokenPackageDecl, Value: "package views"},
 		{Type: TokenImportDecl, Value: `import "fmt"`},
-		{Type: TokenGoxDecl, Value: "gox Hello(name string) {"},
+		{Type: TokenGoxDecl, Value: "func Hello(name string) {"},
 		{Type: TokenHTMLText, Value: "\n  "},
 		{Type: TokenOpenTag, Value: "<h1"},
 		{Type: TokenAttrName, Value: "class="},
@@ -509,7 +509,7 @@ gox Hello(name string) {
 }
 
 func TestDynamicBooleanAttribute(t *testing.T) {
-	input := "gox Hello() {\n<button disabled={{ isDisabled }}>Submit</button>\n}"
+	input := "func Hello() {\n<button disabled={{ isDisabled }}>Submit</button>\n}"
 	assertTokens(t, input, []Token{
 		{Type: TokenGoxDecl},
 		{Type: TokenHTMLText, Value: "\n"},
@@ -528,7 +528,7 @@ func TestDynamicBooleanAttribute(t *testing.T) {
 }
 
 func TestComponentWithChildren(t *testing.T) {
-	input := `gox Page() {
+	input := `func Page() {
 <Card title="Welcome">
   <p>Hello</p>
 </Card>
@@ -554,9 +554,9 @@ func TestComponentWithChildren(t *testing.T) {
 }
 
 func TestEmptyComponent(t *testing.T) {
-	input := "gox Empty() {\n}"
+	input := "func Empty() {\n}"
 	assertTokens(t, input, []Token{
-		{Type: TokenGoxDecl, Value: "gox Empty() {"},
+		{Type: TokenGoxDecl, Value: "func Empty() {"},
 		{Type: TokenHTMLText, Value: "\n"},
 		{Type: TokenBraceClose},
 		{Type: TokenEOF},
@@ -564,7 +564,7 @@ func TestEmptyComponent(t *testing.T) {
 }
 
 func TestExpressionWithComplexGoCode(t *testing.T) {
-	input := `gox Hello(user User) {
+	input := `func Hello(user User) {
 <a href={{ fmt.Sprintf("/users/%d", user.ID) }}>Profile</a>
 }`
 	assertTokens(t, input, []Token{
