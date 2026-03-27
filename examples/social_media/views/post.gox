@@ -1,0 +1,200 @@
+package views
+
+import "strconv"
+import "fmt"
+
+func PostCard(post PostData, currentUser User) {
+  <article class="flex gap-3 px-4 py-3 transition-colors cursor-pointer" style="border-bottom:1px solid #2f3336" onmouseover="this.style.backgroundColor='rgba(231,233,234,0.03)'" onmouseout="this.style.backgroundColor='transparent'">
+    <a href={{ "/user/" + post.Username }} onclick="event.stopPropagation()" style="text-decoration:none;flex-shrink:0">
+      <Avatar username={{ post.Username }} size="md" />
+    </a>
+    <div class="flex-1 min-w-0">
+      {{ if IsReply(post) }}
+        <div class="text-[13px] mb-0.5" style="color:#71767b">
+          Replying to <a href={{ "/user/" + post.ReplyToUser }} class="hover:underline" style="color:#1d9bf0" onclick="event.stopPropagation()">@{{ post.ReplyToUser }}</a>
+        </div>
+      {{ end }}
+      <div class="flex items-center gap-1 mb-0.5">
+        <a href={{ "/user/" + post.Username }} class="font-bold text-[15px] hover:underline truncate" style="color:#e7e9ea;text-decoration:none" onclick="event.stopPropagation()">{{ post.DisplayName }}</a>
+        <span class="text-[15px] truncate" style="color:#71767b">@{{ post.Username }}</span>
+        <span style="color:#71767b">&#xB7;</span>
+        <a href={{ "/post/" + strconv.Itoa(post.ID) }} class="text-[15px] hover:underline flex-shrink-0" style="color:#71767b;text-decoration:none" onclick="event.stopPropagation()">{{ post.TimeAgo }}</a>
+      </div>
+      <a href={{ "/post/" + strconv.Itoa(post.ID) }} style="text-decoration:none;color:inherit">
+        <div class="text-[15px] leading-5 post-content" style="color:#e7e9ea">{{ post.Content }}</div>
+      </a>
+      <div class="flex items-center gap-0 mt-3 -ml-2 max-w-[425px] justify-between">
+        <a href={{ "/post/" + strconv.Itoa(post.ID) }} class="flex items-center gap-1 group" style="text-decoration:none" onclick="event.stopPropagation()">
+          <div class="p-2 rounded-full transition-colors group-hover:bg-blue-500/10">
+            <svg viewBox="0 0 24 24" class="w-[18px] h-[18px] transition-colors group-hover:fill-blue-400" fill="#71767b">
+              <path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.25-.893 4.34-2.457 5.86l-7.17 6.97c-.77.75-2.03.74-2.79-.02L2.929 16.1C2.12 15.26 1.751 14.09 1.751 12.85V10zm8.005-6c-3.317 0-6.005 2.69-6.005 6v2.85c0 .828.26 1.6.73 2.2l6.87 6.61 7.13-6.93c1.17-1.14 1.77-2.71 1.77-4.39C20.251 6.64 17.621 4 14.122 4H9.756z" />
+            </svg>
+          </div>
+          <span class="text-[13px] transition-colors group-hover:text-blue-400" style="color:#71767b">{{ FormatCount(post.CommentCount) }}</span>
+        </a>
+
+        <form method="POST" action={{ fmt.Sprintf("/post/%d/reply", post.ID) }} class="inline" onclick="event.stopPropagation()">
+          <input type="hidden" name="content" value={{ fmt.Sprintf("RT @%s", post.Username) }} />
+          <button type="button" class="flex items-center gap-1 group" onclick={{ fmt.Sprintf("window.location.href='/post/%d'", post.ID) }}>
+            <div class="p-2 rounded-full transition-colors group-hover:bg-green-500/10">
+              <svg viewBox="0 0 24 24" class="w-[18px] h-[18px] transition-colors group-hover:fill-green-400" fill="#71767b">
+                <path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z" />
+              </svg>
+            </div>
+            <span class="text-[13px] transition-colors group-hover:text-green-400" style="color:#71767b">{{ FormatCount(post.ReplyCount) }}</span>
+          </button>
+        </form>
+
+        <form method="POST" action={{ fmt.Sprintf("/post/%d/like", post.ID) }} class="inline" onclick="event.stopPropagation()">
+          <button type="submit" class="flex items-center gap-1 group">
+            <div class="p-2 rounded-full transition-colors group-hover:bg-pink-500/10">
+              {{ if post.Liked }}
+                <svg viewBox="0 0 24 24" class="w-[18px] h-[18px]" fill="#f91880">
+                  <path d="M20.884 13.19c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.45-4.55-.782-6.14.602-1.43 1.743-2.51 2.992-3.11 1.252-.6 2.641-.76 3.88-.34.793.27 1.462.72 1.983 1.24l.248.24c.07-.08.146-.15.228-.22.521-.52 1.189-.97 1.983-1.26 1.239-.42 2.628-.26 3.88.34 1.249.6 2.39 1.68 2.992 3.11.668 1.59.578 3.64-.782 6.14z" />
+                </svg>
+              {{ else }}
+                <svg viewBox="0 0 24 24" class="w-[18px] h-[18px] transition-colors group-hover:fill-pink-500" fill="#71767b">
+                  <path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.56-1.13-1.666-1.84-2.908-1.91zm4.187 7.69c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.45-4.55-.782-6.14.602-1.43 1.743-2.51 2.992-3.11 1.252-.6 2.641-.76 3.88-.34.793.27 1.462.72 1.983 1.24.521-.52 1.189-.97 1.982-1.24 1.24-.42 2.629-.26 3.881.34 1.25.6 2.39 1.68 2.993 3.11.667 1.59.577 3.64-.783 6.14z" />
+                </svg>
+              {{ end }}
+            </div>
+            {{ if post.Liked }}
+              <span class="text-[13px]" style="color:#f91880">{{ FormatCount(post.LikeCount) }}</span>
+            {{ else }}
+              <span class="text-[13px] transition-colors group-hover:text-pink-500" style="color:#71767b">{{ FormatCount(post.LikeCount) }}</span>
+            {{ end }}
+          </button>
+        </form>
+
+        {{ if post.UserID == currentUser.ID }}
+          <form method="POST" action={{ fmt.Sprintf("/post/%d/delete", post.ID) }} class="inline" onclick="event.stopPropagation()">
+            <button type="submit" class="flex items-center group" onclick="return confirm('Delete this post?')">
+              <div class="p-2 rounded-full transition-colors group-hover:bg-red-500/10">
+                <svg viewBox="0 0 24 24" class="w-[18px] h-[18px] transition-colors group-hover:fill-red-500" fill="#71767b">
+                  <path d="M16 6V4.5C16 3.12 14.88 2 13.5 2h-3C9.11 2 8 3.12 8 4.5V6H3v2h1.06l.81 11.21C4.98 20.78 6.28 22 7.86 22h8.27c1.58 0 2.88-1.22 3-2.79L19.93 8H21V6h-5zm-6-1.5c0-.28.22-.5.5-.5h3c.27 0 .5.22.5.5V6h-4V4.5zm7.13 14.57c-.04.52-.47.93-1 .93H7.86c-.53 0-.96-.41-1-.93L6.07 8h11.85l-.79 11.07zM9 17v-6h2v6H9zm4 0v-6h2v6h-2z" />
+                </svg>
+              </div>
+            </button>
+          </form>
+        {{ end }}
+      </div>
+    </div>
+  </article>
+}
+
+func PostDetailPage(data PostDetailData) {
+  <Layout title="Post / Gox Social" currentUser={{ data.CurrentUser }}>
+    <PageHeaderWithBack title="Post" backURL="/" />
+
+    {{ for _, parent := range data.Thread }}
+      <article class="flex gap-3 px-4 pt-3 relative" style="border-bottom:none">
+        <div class="flex flex-col items-center">
+          <Avatar username={{ parent.Username }} size="md" />
+          <div class="w-0.5 flex-1 mt-1" style="background:#2f3336"></div>
+        </div>
+        <div class="flex-1 min-w-0 pb-3">
+          <div class="flex items-center gap-1 mb-0.5">
+            <a href={{ "/user/" + parent.Username }} class="font-bold text-[15px] hover:underline" style="color:#e7e9ea;text-decoration:none">{{ parent.DisplayName }}</a>
+            <span class="text-[15px]" style="color:#71767b">@{{ parent.Username }}</span>
+            <span style="color:#71767b">&#xB7;</span>
+            <span class="text-[15px]" style="color:#71767b">{{ parent.TimeAgo }}</span>
+          </div>
+          <div class="text-[15px] leading-5 post-content" style="color:#e7e9ea">{{ parent.Content }}</div>
+        </div>
+      </article>
+    {{ end }}
+
+    <article class="px-4 py-3" style="border-bottom:1px solid #2f3336">
+      <div class="flex items-center gap-3 mb-3">
+        <a href={{ "/user/" + data.Post.Username }} style="text-decoration:none">
+          <Avatar username={{ data.Post.Username }} size="md" />
+        </a>
+        <div>
+          <a href={{ "/user/" + data.Post.Username }} class="font-bold text-[17px] hover:underline block leading-5" style="color:#e7e9ea;text-decoration:none">{{ data.Post.DisplayName }}</a>
+          <span class="text-[15px]" style="color:#71767b">@{{ data.Post.Username }}</span>
+        </div>
+      </div>
+      <div class="text-[17px] leading-6 post-content mb-3" style="color:#e7e9ea">{{ data.Post.Content }}</div>
+      <div class="py-3 text-[15px]" style="color:#71767b;border-top:1px solid #2f3336">
+        {{ data.Post.TimeAgo }}
+      </div>
+      <div class="flex gap-6 py-3" style="border-top:1px solid #2f3336">
+        <div>
+          <span class="font-bold text-[15px]" style="color:#e7e9ea">{{ FormatCount(data.Post.ReplyCount) }}</span>
+          <span class="text-[15px] ml-1" style="color:#71767b">Replies</span>
+        </div>
+        <div>
+          <span class="font-bold text-[15px]" style="color:#e7e9ea">{{ FormatCount(data.Post.LikeCount) }}</span>
+          <span class="text-[15px] ml-1" style="color:#71767b">Likes</span>
+        </div>
+        <div>
+          <span class="font-bold text-[15px]" style="color:#e7e9ea">{{ FormatCount(data.Post.CommentCount) }}</span>
+          <span class="text-[15px] ml-1" style="color:#71767b">Comments</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-around py-1" style="border-top:1px solid #2f3336">
+        <form method="POST" action={{ fmt.Sprintf("/post/%d/like", data.Post.ID) }}>
+          <button type="submit" class="p-2 rounded-full transition-colors hover:bg-pink-500/10 group">
+            {{ if data.Post.Liked }}
+              <svg viewBox="0 0 24 24" class="w-[22px] h-[22px]" fill="#f91880">
+                <path d="M20.884 13.19c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.45-4.55-.782-6.14.602-1.43 1.743-2.51 2.992-3.11 1.252-.6 2.641-.76 3.88-.34.793.27 1.462.72 1.983 1.24l.248.24c.07-.08.146-.15.228-.22.521-.52 1.189-.97 1.983-1.26 1.239-.42 2.628-.26 3.88.34 1.249.6 2.39 1.68 2.992 3.11.668 1.59.578 3.64-.782 6.14z" />
+              </svg>
+            {{ else }}
+              <svg viewBox="0 0 24 24" class="w-[22px] h-[22px] transition-colors group-hover:fill-pink-500" fill="#71767b">
+                <path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.56-1.13-1.666-1.84-2.908-1.91zm4.187 7.69c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.45-4.55-.782-6.14.602-1.43 1.743-2.51 2.992-3.11 1.252-.6 2.641-.76 3.88-.34.793.27 1.462.72 1.983 1.24.521-.52 1.189-.97 1.982-1.24 1.24-.42 2.629-.26 3.881.34 1.25.6 2.39 1.68 2.993 3.11.667 1.59.577 3.64-.783 6.14z" />
+              </svg>
+            {{ end }}
+          </button>
+        </form>
+      </div>
+    </article>
+
+    <div style="border-bottom:1px solid #2f3336">
+      <ComposeBox action={{ fmt.Sprintf("/post/%d/reply", data.Post.ID) }} placeholder="Post your reply" buttonText="Reply" currentUser={{ data.CurrentUser }} />
+    </div>
+
+    {{ if len(data.Replies) > 0 }}
+      {{ for _, reply := range data.Replies }}
+        <PostCard post={{ reply }} currentUser={{ data.CurrentUser }} />
+      {{ end }}
+    {{ end }}
+
+    {{ if len(data.Comments) > 0 }}
+      <div class="px-4 py-3" style="border-bottom:1px solid #2f3336">
+        <h3 class="font-bold text-[17px] mb-3" style="color:#e7e9ea">Comments</h3>
+        {{ for _, comment := range data.Comments }}
+          <CommentItem comment={{ comment }} />
+        {{ end }}
+      </div>
+    {{ end }}
+
+    <div class="px-4 py-3" style="border-bottom:1px solid #2f3336">
+      <form method="POST" action={{ fmt.Sprintf("/post/%d/comment", data.Post.ID) }} class="flex gap-3">
+        <Avatar username={{ data.CurrentUser.Username }} size="sm" />
+        <div class="flex-1">
+          <textarea name="content" rows="2" placeholder="Add a comment..." required class="w-full bg-transparent text-[15px] py-2" style="color:#e7e9ea;border:none"></textarea>
+          <div class="flex justify-end">
+            <button type="submit" class="px-4 py-1.5 rounded-full font-bold text-sm" style="background:#1d9bf0;color:#fff">Comment</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </Layout>
+}
+
+func CommentItem(comment CommentData) {
+  <div class="flex gap-3 py-3" style="border-bottom:1px solid rgba(47,51,54,0.5)">
+    <a href={{ "/user/" + comment.Username }} style="text-decoration:none;flex-shrink:0">
+      <Avatar username={{ comment.Username }} size="sm" />
+    </a>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-1 mb-0.5">
+        <a href={{ "/user/" + comment.Username }} class="font-bold text-[15px] hover:underline" style="color:#e7e9ea;text-decoration:none">{{ comment.DisplayName }}</a>
+        <span class="text-[15px]" style="color:#71767b">@{{ comment.Username }}</span>
+        <span style="color:#71767b">&#xB7;</span>
+        <span class="text-[13px]" style="color:#71767b">{{ comment.TimeAgo }}</span>
+      </div>
+      <div class="text-[15px] leading-5" style="color:#e7e9ea">{{ comment.Content }}</div>
+    </div>
+  </div>
+}

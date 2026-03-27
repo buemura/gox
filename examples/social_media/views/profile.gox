@@ -1,0 +1,71 @@
+package views
+
+import "strconv"
+import "fmt"
+
+func ProfilePage(data ProfileData) {
+  <Layout title={{ data.ProfileUser.DisplayName + " (@" + data.ProfileUser.Username + ") / Gox Social" }} currentUser={{ data.CurrentUser }}>
+    <PageHeaderWithBack title={{ data.ProfileUser.DisplayName }} backURL="/" />
+
+    <div class="h-[200px]" style={{ "background:linear-gradient(135deg, " + AvatarColor(data.ProfileUser.Username) + " 0%, #000 100%)" }}></div>
+
+    <div class="px-4 pb-3" style="border-bottom:1px solid #2f3336">
+      <div class="flex justify-between items-start -mt-[42px] mb-3">
+        <div class="rounded-full p-1" style="background:#000">
+          <Avatar username={{ data.ProfileUser.Username }} size="lg" />
+        </div>
+
+        {{ if data.IsOwnProfile }}
+          <a href="#" class="mt-[52px] px-4 py-1.5 rounded-full font-bold text-[15px] transition-colors" style="border:1px solid #536471;color:#e7e9ea;text-decoration:none" onmouseover="this.style.backgroundColor='rgba(239,243,244,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+            Edit profile
+          </a>
+        {{ else }}
+          <form method="POST" action={{ fmt.Sprintf("/user/%s/follow", data.ProfileUser.Username) }} class="mt-[52px]">
+            {{ if data.IsFollowing }}
+              <button type="submit" class="px-4 py-1.5 rounded-full font-bold text-[15px] transition-colors" style="border:1px solid #536471;color:#e7e9ea" onmouseover="this.style.borderColor='#67070f';this.style.color='#f4212e';this.textContent='Unfollow'" onmouseout="this.style.borderColor='#536471';this.style.color='#e7e9ea';this.textContent='Following'">
+                Following
+              </button>
+            {{ else }}
+              <button type="submit" class="px-4 py-1.5 rounded-full font-bold text-[15px] transition-colors" style="background:#e7e9ea;color:#0f1419" onmouseover="this.style.background='#d7dbdc'" onmouseout="this.style.background='#e7e9ea'">
+                Follow
+              </button>
+            {{ end }}
+          </form>
+        {{ end }}
+      </div>
+
+      <div class="mb-3">
+        <h2 class="text-xl font-extrabold leading-6" style="color:#e7e9ea">{{ data.ProfileUser.DisplayName }}</h2>
+        <span class="text-[15px]" style="color:#71767b">@{{ data.ProfileUser.Username }}</span>
+      </div>
+
+      {{ if data.ProfileUser.Bio != "" }}
+        <p class="text-[15px] leading-5 mb-3" style="color:#e7e9ea">{{ data.ProfileUser.Bio }}</p>
+      {{ end }}
+
+      <div class="flex gap-5">
+        <span class="text-sm" style="color:#71767b">
+          <span class="font-bold" style="color:#e7e9ea">{{ strconv.Itoa(data.ProfileUser.FollowingCount) }}</span> Following
+        </span>
+        <span class="text-sm" style="color:#71767b">
+          <span class="font-bold" style="color:#e7e9ea">{{ strconv.Itoa(data.ProfileUser.FollowerCount) }}</span> Followers
+        </span>
+      </div>
+    </div>
+
+    <div class="flex" style="border-bottom:1px solid #2f3336">
+      <div class="flex-1 flex justify-center py-4 transition-colors hover:bg-xhover relative">
+        <span class="font-bold text-[15px]" style="color:#e7e9ea">Posts</span>
+        <div class="absolute bottom-0 h-1 w-14 rounded-full" style="background:#1d9bf0"></div>
+      </div>
+    </div>
+
+    {{ if len(data.Posts) == 0 }}
+      <EmptyState message="No posts yet." />
+    {{ else }}
+      {{ for _, post := range data.Posts }}
+        <PostCard post={{ post }} currentUser={{ data.CurrentUser }} />
+      {{ end }}
+    {{ end }}
+  </Layout>
+}

@@ -1,0 +1,52 @@
+package views
+
+func ComposeBox(action string, placeholder string, buttonText string, currentUser User) {
+  <div class="px-4 py-3 flex gap-3" style="border-bottom:1px solid #2f3336">
+    <Avatar username={{ currentUser.Username }} size="md" />
+    <form method="POST" action={{ action }} class="flex-1 flex flex-col">
+      <textarea name="content" rows="3" placeholder={{ placeholder }} required class="w-full bg-transparent text-xl py-3 placeholder-opacity-60" style="color:#e7e9ea;border:none" onfocus="this.parentElement.querySelector('button').style.opacity='1'"></textarea>
+      <div class="flex justify-end pt-3" style="border-top:1px solid #2f3336">
+        <button type="submit" class="px-5 py-2 rounded-full font-bold text-[15px] transition-all" style="background:#1d9bf0;color:#fff;opacity:0.85" onmouseover="this.style.background='#1a8cd8'" onmouseout="this.style.background='#1d9bf0'">
+          {{ buttonText }}
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+func FeedPage(data FeedPageData) {
+  <Layout title="Home / Gox Social" currentUser={{ data.CurrentUser }}>
+    <PageHeader title="Home" />
+    <ComposeBox action="/posts" placeholder="What is happening?!" buttonText="Post" currentUser={{ data.CurrentUser }} />
+    {{ if len(data.Posts) == 0 }}
+      <EmptyState message="No posts yet. Follow some users or create your first post!" />
+    {{ else }}
+      {{ for _, post := range data.Posts }}
+        <PostCard post={{ post }} currentUser={{ data.CurrentUser }} />
+      {{ end }}
+    {{ end }}
+  </Layout>
+}
+
+func ExplorePage(data ExploreData) {
+  <Layout title="Explore / Gox Social" currentUser={{ data.CurrentUser }}>
+    <PageHeader title="Explore" />
+
+    {{ if len(data.SuggestedUsers) > 0 }}
+      <div style="border-bottom:1px solid #2f3336">
+        <h2 class="px-4 pt-3 pb-1 font-extrabold text-xl" style="color:#e7e9ea">Who to follow</h2>
+        {{ for _, user := range data.SuggestedUsers }}
+          <UserCard user={{ user }} />
+        {{ end }}
+      </div>
+    {{ end }}
+
+    {{ if len(data.Posts) == 0 }}
+      <EmptyState message="No posts yet. Be the first to post!" />
+    {{ else }}
+      {{ for _, post := range data.Posts }}
+        <PostCard post={{ post }} currentUser={{ data.CurrentUser }} />
+      {{ end }}
+    {{ end }}
+  </Layout>
+}

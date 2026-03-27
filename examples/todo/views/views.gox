@@ -1,0 +1,57 @@
+package views
+
+import "strconv"
+
+func Layout(title string) {
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>{{ title }}</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100 min-h-screen">
+      <div class="max-w-xl mx-auto px-5 py-10">
+        {{ children }}
+      </div>
+    </body>
+  </html>
+}
+
+func TodoItem(id int, text string, done bool) {
+  <li class={{ todoItemClass(done) }}>
+    <form method="POST" action="/toggle">
+      <input type="hidden" name="id" value={{ strconv.Itoa(id) }} />
+      {{ if done }}
+        <button type="submit" class="text-lg">&#x2705;</button>
+      {{ else }}
+        <button type="submit" class="text-lg">&#x2B1C;</button>
+      {{ end }}
+    </form>
+    <span class={{ todoTextClass(done) }}>{{ text }}</span>
+    <form method="POST" action="/delete">
+      <input type="hidden" name="id" value={{ strconv.Itoa(id) }} />
+      <button type="submit" class="px-2.5 py-1 border border-red-500 text-red-500 rounded hover:bg-red-50 text-sm">&#x2716;</button>
+    </form>
+  </li>
+}
+
+func TodoList(todos []Todo) {
+  <Layout title="Gox Todo App">
+    <h1 class="text-2xl font-bold text-gray-800 mb-5">Todo App</h1>
+    <form class="flex gap-2 mb-6" method="POST" action="/add">
+      <input type="text" name="text" placeholder="What needs to be done?" required class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+      <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-base font-medium cursor-pointer">Add</button>
+    </form>
+    {{ if len(todos) == 0 }}
+      <p class="text-center text-gray-400 py-10">No todos yet. Add one above!</p>
+    {{ else }}
+      <ul class="space-y-2">
+        {{ for _, todo := range todos }}
+          <TodoItem id={{ todo.ID }} text={{ todo.Text }} done={{ todo.Done }} />
+        {{ end }}
+      </ul>
+    {{ end }}
+  </Layout>
+}
