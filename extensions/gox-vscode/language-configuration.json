@@ -1,0 +1,36 @@
+{
+  "comments": {
+    "lineComment": "//",
+    "blockComment": ["/*", "*/"]
+  },
+  "brackets": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"]
+  ],
+  "autoClosingPairs": [
+    { "open": "{", "close": "}", "notIn": ["string"] },
+    { "open": "[", "close": "]", "notIn": ["string"] },
+    { "open": "(", "close": ")", "notIn": ["string"] },
+    { "open": "\"", "close": "\"", "notIn": ["string"] },
+    { "open": "'", "close": "'", "notIn": ["string"] },
+    { "open": "<!--", "close": " -->" }
+  ],
+  "surroundingPairs": [
+    { "open": "{", "close": "}" },
+    { "open": "[", "close": "]" },
+    { "open": "(", "close": ")" },
+    { "open": "\"", "close": "\"" },
+    { "open": "'", "close": "'" }
+  ],
+  "folding": {
+    "markers": {
+      "start": "^\\s*(func\\s|<[a-zA-Z]|\\{\\{\\s*(if|for|switch)\\b)",
+      "end": "^\\s*(\\}$|</|\\{\\{\\s*end\\s*\\}\\})"
+    }
+  },
+  "indentationRules": {
+    "increaseIndentPattern": "(<[a-zA-Z][^/>]*(?<!/)>|\\{\\{\\s*(if|for|switch|else|case|default)\\b.*\\}\\}|\\{\\s*$)",
+    "decreaseIndentPattern": "(^\\s*</[a-zA-Z]|^\\s*\\}$|^\\s*\\{\\{\\s*(end|else|case|default)\\b)"
+  }
+}

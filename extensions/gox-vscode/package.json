@@ -1,0 +1,39 @@
+{
+  "name": "gox-vscode",
+  "displayName": "Gox",
+  "description": "Syntax highlighting for Gox template files (.gox)",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "gox",
+        "aliases": [
+          "Gox",
+          "gox"
+        ],
+        "extensions": [
+          ".gox"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "gox",
+        "scopeName": "source.gox",
+        "path": "./syntaxes/gox.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.go": "go",
+          "meta.embedded.block.js": "js",
+          "meta.embedded.block.css": "css"
+        }
+      }
+    ]
+  }
+}
