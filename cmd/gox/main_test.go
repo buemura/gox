@@ -106,9 +106,9 @@ func ItemList(items []string) {
 
 	src := string(content)
 	assertContains(t, src, "for _, item := range items")
-	assertContains(t, src, `"<li"`)
-	assertContains(t, src, `"</li>"`)
-	assertContains(t, src, `"</ul>"`)
+	assertContains(t, src, `<li>`)
+	assertContains(t, src, `</li>`)
+	assertContains(t, src, `</ul>`)
 
 }
 

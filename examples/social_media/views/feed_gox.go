@@ -11,27 +11,7 @@ func ComposeBox(action string, placeholder string, buttonText string, currentUse
 	return gox.ComponentFunc(func(w io.Writer) error {
 		var err error
 		_ = err
-		_, err = io.WriteString(w, "\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<div")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"px-4 py-3 flex gap-3\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"border-bottom:1px solid #2f3336\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
+		_, err = io.WriteString(w, "\n  <div class=\"px-4 py-3 flex gap-3\" style=\"border-bottom:1px solid #2f3336\">\n    ")
 		if err != nil {
 			return err
 		}
@@ -39,19 +19,7 @@ func ComposeBox(action string, placeholder string, buttonText string, currentUse
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<form")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " method=\"POST\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " action=\"")
+		_, err = io.WriteString(w, "\n    <form method=\"POST\" action=\"")
 		if err != nil {
 			return err
 		}
@@ -59,35 +27,7 @@ func ComposeBox(action string, placeholder string, buttonText string, currentUse
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"flex-1 flex flex-col\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<textarea")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " name=\"content\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " rows=\"3\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " placeholder=\"")
+		_, err = io.WriteString(w, "\" class=\"flex-1 flex flex-col\">\n      <textarea name=\"content\" rows=\"3\" placeholder=\"")
 		if err != nil {
 			return err
 		}
@@ -95,87 +35,7 @@ func ComposeBox(action string, placeholder string, buttonText string, currentUse
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " required")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"w-full bg-transparent text-xl py-3 placeholder-opacity-60\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"color:#e7e9ea;border:none\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " onfocus=\"this.parentElement.querySelector('button').style.opacity='1'\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</textarea>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<div")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"flex justify-end pt-3\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"border-top:1px solid #2f3336\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n        ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<button")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " type=\"submit\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"px-5 py-2 rounded-full font-bold text-[15px] transition-all\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"background:#1d9bf0;color:#fff;opacity:0.85\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " onmouseover=\"this.style.background='#1a8cd8'\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " onmouseout=\"this.style.background='#1d9bf0'\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n          ")
+		_, err = io.WriteString(w, "\" required class=\"w-full bg-transparent text-xl py-3 placeholder-opacity-60\" style=\"color:#e7e9ea;border:none\" onfocus=\"this.parentElement.querySelector('button').style.opacity='1'\"></textarea>\n      <div class=\"flex justify-end pt-3\" style=\"border-top:1px solid #2f3336\">\n        <button type=\"submit\" class=\"px-5 py-2 rounded-full font-bold text-[15px] transition-all\" style=\"background:#1d9bf0;color:#fff;opacity:0.85\" onmouseover=\"this.style.background='#1a8cd8'\" onmouseout=\"this.style.background='#1d9bf0'\">\n          ")
 		if err != nil {
 			return err
 		}
@@ -183,39 +43,7 @@ func ComposeBox(action string, placeholder string, buttonText string, currentUse
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\n        ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</button>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</div>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</form>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</div>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n")
+		_, err = io.WriteString(w, "\n        </button>\n      </div>\n    </form>\n  </div>\n")
 		if err != nil {
 			return err
 		}
@@ -332,51 +160,7 @@ func ExplorePage(data ExploreData) gox.Component {
 				return err
 			}
 			if len(data.SuggestedUsers) > 0 {
-				_, err = io.WriteString(w, "\n      ")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "<div")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, " style=\"border-bottom:1px solid #2f3336\"")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, ">")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "\n        ")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "<h2")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, " class=\"px-4 pt-3 pb-1 font-extrabold text-xl\"")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, " style=\"color:#e7e9ea\"")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, ">")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "Who to follow")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "</h2>")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "\n        ")
+				_, err = io.WriteString(w, "\n      <div style=\"border-bottom:1px solid #2f3336\">\n        <h2 class=\"px-4 pt-3 pb-1 font-extrabold text-xl\" style=\"color:#e7e9ea\">Who to follow</h2>\n        ")
 				if err != nil {
 					return err
 				}
@@ -394,15 +178,7 @@ func ExplorePage(data ExploreData) gox.Component {
 						return err
 					}
 				}
-				_, err = io.WriteString(w, "\n      ")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "</div>")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "\n    ")
+				_, err = io.WriteString(w, "\n      </div>\n    ")
 				if err != nil {
 					return err
 				}

@@ -17,15 +17,7 @@ func Avatar(username string, size string) gox.Component {
 		}
 		switch size {
 		case "lg":
-			_, err = io.WriteString(w, "\n      ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "<div")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " style=\"")
+			_, err = io.WriteString(w, "\n      <div style=\"")
 			if err != nil {
 				return err
 			}
@@ -33,15 +25,7 @@ func Avatar(username string, size string) gox.Component {
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, "\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, ">")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n        ")
+			_, err = io.WriteString(w, "\">\n        ")
 			if err != nil {
 				return err
 			}
@@ -49,28 +33,12 @@ func Avatar(username string, size string) gox.Component {
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, "\n      ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "</div>")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n    ")
+			_, err = io.WriteString(w, "\n      </div>\n    ")
 			if err != nil {
 				return err
 			}
 		case "md":
-			_, err = io.WriteString(w, "\n      ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "<div")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " style=\"")
+			_, err = io.WriteString(w, "\n      <div style=\"")
 			if err != nil {
 				return err
 			}
@@ -78,15 +46,7 @@ func Avatar(username string, size string) gox.Component {
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, "\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, ">")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n        ")
+			_, err = io.WriteString(w, "\">\n        ")
 			if err != nil {
 				return err
 			}
@@ -94,28 +54,12 @@ func Avatar(username string, size string) gox.Component {
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, "\n      ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "</div>")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n    ")
+			_, err = io.WriteString(w, "\n      </div>\n    ")
 			if err != nil {
 				return err
 			}
 		default:
-			_, err = io.WriteString(w, "\n      ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "<div")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " style=\"")
+			_, err = io.WriteString(w, "\n      <div style=\"")
 			if err != nil {
 				return err
 			}
@@ -123,15 +67,7 @@ func Avatar(username string, size string) gox.Component {
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, "\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, ">")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n        ")
+			_, err = io.WriteString(w, "\">\n        ")
 			if err != nil {
 				return err
 			}
@@ -139,15 +75,7 @@ func Avatar(username string, size string) gox.Component {
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, "\n      ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "</div>")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n  ")
+			_, err = io.WriteString(w, "\n      </div>\n  ")
 			if err != nil {
 				return err
 			}
@@ -164,107 +92,7 @@ func EmptyState(message string) gox.Component {
 	return gox.ComponentFunc(func(w io.Writer) error {
 		var err error
 		_ = err
-		_, err = io.WriteString(w, "\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<div")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"flex flex-col items-center justify-center py-16 px-4\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<svg")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"w-12 h-12 mb-4\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"color:#2f3336\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " fill=\"none\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " viewBox=\"0 0 24 24\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " stroke=\"currentColor\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<path")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " stroke-linecap=\"round\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " stroke-linejoin=\"round\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " stroke-width=\"1.5\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " d=\"M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " />")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</svg>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<p")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"color:#71767b\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"text-base\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
+		_, err = io.WriteString(w, "\n  <div class=\"flex flex-col items-center justify-center py-16 px-4\">\n    <svg class=\"w-12 h-12 mb-4\" style=\"color:#2f3336\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n      <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z\" />\n    </svg>\n    <p style=\"color:#71767b\" class=\"text-base\">")
 		if err != nil {
 			return err
 		}
@@ -272,19 +100,7 @@ func EmptyState(message string) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "</p>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</div>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n")
+		_, err = io.WriteString(w, "</p>\n  </div>\n")
 		if err != nil {
 			return err
 		}
@@ -296,15 +112,7 @@ func UserCard(user User) gox.Component {
 	return gox.ComponentFunc(func(w io.Writer) error {
 		var err error
 		_ = err
-		_, err = io.WriteString(w, "\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<a")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " href=\"")
+		_, err = io.WriteString(w, "\n  <a href=\"")
 		if err != nil {
 			return err
 		}
@@ -312,31 +120,7 @@ func UserCard(user User) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"flex items-center gap-3 px-4 py-3 transition-colors\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"text-decoration:none\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " onmouseover=\"this.style.backgroundColor='#16181c'\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " onmouseout=\"this.style.backgroundColor='transparent'\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
+		_, err = io.WriteString(w, "\" class=\"flex items-center gap-3 px-4 py-3 transition-colors\" style=\"text-decoration:none\" onmouseover=\"this.style.backgroundColor='#16181c'\" onmouseout=\"this.style.backgroundColor='transparent'\">\n    ")
 		if err != nil {
 			return err
 		}
@@ -344,39 +128,7 @@ func UserCard(user User) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<div")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"flex-1 min-w-0\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<div")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"font-bold text-sm truncate\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"color:#e7e9ea\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
+		_, err = io.WriteString(w, "\n    <div class=\"flex-1 min-w-0\">\n      <div class=\"font-bold text-sm truncate\" style=\"color:#e7e9ea\">")
 		if err != nil {
 			return err
 		}
@@ -384,31 +136,7 @@ func UserCard(user User) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "</div>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<div")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"text-sm truncate\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"color:#71767b\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "@")
+		_, err = io.WriteString(w, "</div>\n      <div class=\"text-sm truncate\" style=\"color:#71767b\">@")
 		if err != nil {
 			return err
 		}
@@ -416,55 +144,7 @@ func UserCard(user User) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "</div>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</div>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<div")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"px-4 py-1.5 rounded-full text-sm font-bold\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " style=\"background:#e7e9ea;color:#0f1419\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "Follow")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</div>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</a>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n")
+		_, err = io.WriteString(w, "</div>\n    </div>\n    <div class=\"px-4 py-1.5 rounded-full text-sm font-bold\" style=\"background:#e7e9ea;color:#0f1419\">Follow</div>\n  </a>\n")
 		if err != nil {
 			return err
 		}

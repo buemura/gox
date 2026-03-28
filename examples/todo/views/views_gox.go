@@ -2,89 +2,18 @@ package views
 
 import (
 	"fmt"
-	"github.com/buemura/gox"
 	"html"
 	"io"
 	"strconv"
+
+	"github.com/buemura/gox"
 )
 
 func Layout(title string, children gox.Component) gox.Component {
 	return gox.ComponentFunc(func(w io.Writer) error {
 		var err error
 		_ = err
-		_, err = io.WriteString(w, "\n  <!DOCTYPE html>\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<html")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " lang=\"en\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<head")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<meta")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " charset=\"UTF-8\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " />")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<meta")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " name=\"viewport\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " content=\"width=device-width, initial-scale=1.0\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " />")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<title")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
+		_, err = io.WriteString(w, "\n  <!DOCTYPE html>\n  <html lang=\"en\">\n    <head>\n      <meta charset=\"UTF-8\" />\n      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n      <title>")
 		if err != nil {
 			return err
 		}
@@ -92,71 +21,7 @@ func Layout(title string, children gox.Component) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "</title>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<script")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " src=\"https://cdn.tailwindcss.com\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</script>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</head>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<body")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"bg-gray-100 min-h-screen\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<div")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"max-w-xl mx-auto px-5 py-10\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n        ")
+		_, err = io.WriteString(w, "</title>\n      <script src=\"https://cdn.tailwindcss.com\"></script>\n    </head>\n    <body class=\"bg-gray-100 min-h-screen\">\n      <div class=\"max-w-xl mx-auto px-5 py-10\">\n        ")
 		if err != nil {
 			return err
 		}
@@ -166,31 +31,7 @@ func Layout(title string, children gox.Component) gox.Component {
 				return err
 			}
 		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</div>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</body>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</html>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n")
+		_, err = io.WriteString(w, "\n      </div>\n    </body>\n  </html>\n")
 		if err != nil {
 			return err
 		}
@@ -202,15 +43,7 @@ func TodoItem(id int, text string, done bool) gox.Component {
 	return gox.ComponentFunc(func(w io.Writer) error {
 		var err error
 		_ = err
-		_, err = io.WriteString(w, "\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<li")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"")
+		_, err = io.WriteString(w, "\n  <li class=\"")
 		if err != nil {
 			return err
 		}
@@ -218,51 +51,7 @@ func TodoItem(id int, text string, done bool) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<form")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " method=\"POST\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " action=\"/toggle\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<input")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " type=\"hidden\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " name=\"id\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " value=\"")
+		_, err = io.WriteString(w, "\">\n    <form method=\"POST\" action=\"/toggle\">\n      <input type=\"hidden\" name=\"id\" value=\"")
 		if err != nil {
 			return err
 		}
@@ -270,102 +59,22 @@ func TodoItem(id int, text string, done bool) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " />")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
+		_, err = io.WriteString(w, "\" />\n      ")
 		if err != nil {
 			return err
 		}
 		if done {
-			_, err = io.WriteString(w, "\n        ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "<button")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " type=\"submit\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " class=\"text-lg\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, ">")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "&#x2705;")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "</button>")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n      ")
+			_, err = io.WriteString(w, "\n        <button type=\"submit\" class=\"text-lg\">&#x2705;</button>\n      ")
 			if err != nil {
 				return err
 			}
 		} else {
-			_, err = io.WriteString(w, "\n        ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "<button")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " type=\"submit\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " class=\"text-lg\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, ">")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "&#x2B1C;")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "</button>")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n      ")
+			_, err = io.WriteString(w, "\n        <button type=\"submit\" class=\"text-lg\">&#x2B1C;</button>\n      ")
 			if err != nil {
 				return err
 			}
 		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</form>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<span")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"")
+		_, err = io.WriteString(w, "\n    </form>\n    <span class=\"")
 		if err != nil {
 			return err
 		}
@@ -373,11 +82,7 @@ func TodoItem(id int, text string, done bool) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
+		_, err = io.WriteString(w, "\">")
 		if err != nil {
 			return err
 		}
@@ -385,47 +90,7 @@ func TodoItem(id int, text string, done bool) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "</span>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<form")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " method=\"POST\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " action=\"/delete\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<input")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " type=\"hidden\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " name=\"id\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " value=\"")
+		_, err = io.WriteString(w, "</span>\n    <form method=\"POST\" action=\"/delete\">\n      <input type=\"hidden\" name=\"id\" value=\"")
 		if err != nil {
 			return err
 		}
@@ -433,59 +98,7 @@ func TodoItem(id int, text string, done bool) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " />")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n      ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "<button")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " type=\"submit\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, " class=\"px-2.5 py-1 border border-red-500 text-red-500 rounded hover:bg-red-50 text-sm\"")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, ">")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "&#x2716;")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</button>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n    ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</form>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n  ")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "</li>")
-		if err != nil {
-			return err
-		}
-		_, err = io.WriteString(w, "\n")
+		_, err = io.WriteString(w, "\" />\n      <button type=\"submit\" class=\"px-2.5 py-1 border border-red-500 text-red-500 rounded hover:bg-red-50 text-sm\">&#x2716;</button>\n    </form>\n  </li>\n")
 		if err != nil {
 			return err
 		}
@@ -504,173 +117,17 @@ func TodoList(todos []Todo) gox.Component {
 		err = Layout("Gox Todo App", gox.ComponentFunc(func(w io.Writer) error {
 			var err error
 			_ = err
-			_, err = io.WriteString(w, "\n    ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "<h1")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " class=\"text-2xl font-bold text-gray-800 mb-5\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, ">")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "Todo App")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "</h1>")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n    ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "<form")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " class=\"flex gap-2 mb-6\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " method=\"POST\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " action=\"/add\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, ">")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n      ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "<input")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " type=\"text\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " name=\"text\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " placeholder=\"What needs to be done?\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " required")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " class=\"flex-1 px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " />")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n      ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "<button")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " type=\"submit\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, " class=\"px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-base font-medium cursor-pointer\"")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, ">")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "Add")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "</button>")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n    ")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "</form>")
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, "\n    ")
+			_, err = io.WriteString(w, "\n    <h1 class=\"text-2xl font-bold text-gray-800 mb-5\">Todo App</h1>\n    <form class=\"flex gap-2 mb-6\" method=\"POST\" action=\"/add\">\n      <input type=\"text\" name=\"text\" placeholder=\"What needs to be done?\" required class=\"flex-1 px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\" />\n      <button type=\"submit\" class=\"px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-base font-medium cursor-pointer\">Add</button>\n    </form>\n    ")
 			if err != nil {
 				return err
 			}
 			if len(todos) == 0 {
-				_, err = io.WriteString(w, "\n      ")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "<p")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, " class=\"text-center text-gray-400 py-10\"")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, ">")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "No todos yet. Add one above!")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "</p>")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "\n    ")
+				_, err = io.WriteString(w, "\n      <p class=\"text-center text-gray-400 py-10\">No todos yet. Add one above!</p>\n    ")
 				if err != nil {
 					return err
 				}
 			} else {
-				_, err = io.WriteString(w, "\n      ")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "<ul")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, " class=\"space-y-2\"")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, ">")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "\n        ")
+				_, err = io.WriteString(w, "\n      <ul class=\"space-y-2\">\n        ")
 				if err != nil {
 					return err
 				}
@@ -688,15 +145,7 @@ func TodoList(todos []Todo) gox.Component {
 						return err
 					}
 				}
-				_, err = io.WriteString(w, "\n      ")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "</ul>")
-				if err != nil {
-					return err
-				}
-				_, err = io.WriteString(w, "\n    ")
+				_, err = io.WriteString(w, "\n      </ul>\n    ")
 				if err != nil {
 					return err
 				}

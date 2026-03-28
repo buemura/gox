@@ -10,8 +10,9 @@ import (
 
 // Compiler walks an AST and emits Go source code.
 type Compiler struct {
-	buf    strings.Builder
-	indent int
+	buf       strings.Builder
+	indent    int
+	staticBuf string // accumulates static HTML content for coalescing
 }
 
 // Compile takes a parsed AST File and returns formatted Go source code.
@@ -45,6 +46,19 @@ func (c *Compiler) writeIndent() {
 	for i := 0; i < c.indent; i++ {
 		c.write("\t")
 	}
+}
+
+func (c *Compiler) appendStatic(s string) {
+	c.staticBuf += s
+}
+
+func (c *Compiler) flushStatic() {
+	if c.staticBuf == "" {
+		return
+	}
+	c.writeIndent()
+	c.emitWriteString(c.staticBuf)
+	c.staticBuf = ""
 }
 
 func (c *Compiler) compileFile(file *parser.File) {
@@ -148,6 +162,7 @@ func (c *Compiler) compileComponent(comp *parser.ComponentDecl) {
 	c.writeLine("_ = err")
 
 	c.compileNodes(comp.Body)
+	c.flushStatic()
 
 	c.writeLine("return nil")
 	c.indent--
@@ -240,79 +255,69 @@ func (c *Compiler) compileTextNode(n *parser.TextNode) {
 	if n.Content == "" {
 		return
 	}
-	c.writeIndent()
-	c.emitWriteString(n.Content)
+	c.appendStatic(n.Content)
 }
 
 func (c *Compiler) compileExprNode(n *parser.ExprNode) {
+	c.flushStatic()
 	c.emitWriteExpr(n.Expr)
 }
 
 func (c *Compiler) compileRawExprNode(n *parser.RawExprNode) {
+	c.flushStatic()
 	c.emitWriteRawExpr(n.Expr)
 }
 
 func (c *Compiler) compileHTMLElement(el *parser.HTMLElement) {
 	// Open tag
-	c.writeIndent()
-	c.emitWriteString("<" + el.Tag)
+	c.appendStatic("<" + el.Tag)
 
 	// Static and dynamic attributes
 	for _, attr := range el.Attributes {
 		if attr.Spread {
+			c.flushStatic()
 			c.compileSpreadAttr(attr)
 		} else if attr.Boolean {
-			c.compileBooleanAttr(attr)
+			if attr.Dynamic {
+				c.flushStatic()
+				c.compileBooleanAttr(attr)
+			} else {
+				c.appendStatic(fmt.Sprintf(` %s`, attr.Name))
+			}
 		} else if attr.Dynamic {
-			c.compileDynamicAttr(attr)
+			c.appendStatic(fmt.Sprintf(` %s="`, attr.Name))
+			c.flushStatic()
+			c.emitWriteExpr(attr.Value)
+			c.appendStatic(`"`)
 		} else {
-			// Static attribute - emit inline
-			c.writeIndent()
-			c.emitWriteString(fmt.Sprintf(` %s="%s"`, attr.Name, attr.Value))
+			// Static attribute - accumulate
+			c.appendStatic(fmt.Sprintf(` %s="%s"`, attr.Name, attr.Value))
 		}
 	}
 
 	if el.SelfClose {
-		c.writeIndent()
-		c.emitWriteString(" />")
+		c.appendStatic(" />")
 		return
 	}
 
-	c.writeIndent()
-	c.emitWriteString(">")
+	c.appendStatic(">")
 
 	// Children
 	c.compileNodes(el.Children)
 
 	// Close tag
-	c.writeIndent()
-	c.emitWriteString("</" + el.Tag + ">")
-}
-
-func (c *Compiler) compileDynamicAttr(attr parser.Attribute) {
-	// Dynamic attribute: emit name="<escaped value>"
-	c.writeIndent()
-	c.emitWriteString(fmt.Sprintf(` %s="`, attr.Name))
-	c.emitWriteExpr(attr.Value)
-	c.writeIndent()
-	c.emitWriteString(`"`)
+	c.appendStatic("</" + el.Tag + ">")
 }
 
 func (c *Compiler) compileBooleanAttr(attr parser.Attribute) {
-	if attr.Dynamic {
-		// Conditional boolean: only emit if expression is truthy
-		c.writeIndent()
-		c.writef("if %s {\n", attr.Value)
-		c.indent++
-		c.writeIndent()
-		c.emitWriteString(fmt.Sprintf(` %s`, attr.Name))
-		c.indent--
-		c.writeLine("}")
-	} else {
-		// Static boolean attribute
-		c.writeIndent()
-		c.emitWriteString(fmt.Sprintf(` %s`, attr.Name))
-	}
+	// Conditional boolean: only emit if expression is truthy
+	c.writeIndent()
+	c.writef("if %s {\n", attr.Value)
+	c.indent++
+	c.writeIndent()
+	c.emitWriteString(fmt.Sprintf(` %s`, attr.Name))
+	c.indent--
+	c.writeLine("}")
 }
 
 func (c *Compiler) compileSpreadAttr(attr parser.Attribute) {
@@ -360,30 +365,36 @@ func (c *Compiler) compileSpreadAttr(attr parser.Attribute) {
 }
 
 func (c *Compiler) compileIfNode(n *parser.IfNode) {
+	c.flushStatic()
 	c.writeIndent()
 	c.writef("if %s {\n", n.Condition)
 	c.indent++
 	c.compileNodes(n.Then)
+	c.flushStatic()
 	c.indent--
 	if len(n.Else) > 0 {
 		c.writeLine("} else {")
 		c.indent++
 		c.compileNodes(n.Else)
+		c.flushStatic()
 		c.indent--
 	}
 	c.writeLine("}")
 }
 
 func (c *Compiler) compileForNode(n *parser.ForNode) {
+	c.flushStatic()
 	c.writeIndent()
 	c.writef("for %s {\n", n.Clause)
 	c.indent++
 	c.compileNodes(n.Body)
+	c.flushStatic()
 	c.indent--
 	c.writeLine("}")
 }
 
 func (c *Compiler) compileSwitchNode(n *parser.SwitchNode) {
+	c.flushStatic()
 	c.writeIndent()
 	c.writef("switch %s {\n", n.Expr)
 	for _, cc := range n.Cases {
@@ -394,12 +405,14 @@ func (c *Compiler) compileSwitchNode(n *parser.SwitchNode) {
 		}
 		c.indent++
 		c.compileNodes(cc.Body)
+		c.flushStatic()
 		c.indent--
 	}
 	c.writeLine("}")
 }
 
 func (c *Compiler) compileComponentCall(call *parser.ComponentCall) {
+	c.flushStatic()
 	// Build argument list from attributes
 	var args []string
 	for _, attr := range call.Attributes {
@@ -428,6 +441,7 @@ func (c *Compiler) buildChildrenComponent(nodes []parser.Node) string {
 	// Build an inline gox.ComponentFunc for children
 	inner := &Compiler{indent: 2}
 	inner.compileNodes(nodes)
+	inner.flushStatic()
 
 	var b strings.Builder
 	b.WriteString("gox.ComponentFunc(func(w io.Writer) error {\n")
@@ -440,6 +454,7 @@ func (c *Compiler) buildChildrenComponent(nodes []parser.Node) string {
 }
 
 func (c *Compiler) compileChildrenNode() {
+	c.flushStatic()
 	c.writeLine("if children != nil {")
 	c.indent++
 	c.writeLine("err = children.Render(w)")
