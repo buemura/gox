@@ -1,21 +1,22 @@
 package views
 
 import (
+	"context"
 	"fmt"
 	"github.com/buemura/gox"
 	"html"
 	"io"
 )
 
-func ComposeBox(action string, placeholder string, buttonText string, currentUser User) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+func ComposeBox(action string, placeholder string, buttonText string) gox.Component {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <div class=\"px-4 py-3 flex gap-3\" style=\"border-bottom:1px solid #2f3336\">\n    ")
 		if err != nil {
 			return err
 		}
-		err = Avatar(currentUser.Username, "md").Render(w)
+		err = Avatar(CurrentUser(ctx).Username, "md").Render(ctx, w)
 		if err != nil {
 			return err
 		}
@@ -52,21 +53,21 @@ func ComposeBox(action string, placeholder string, buttonText string, currentUse
 }
 
 func FeedPage(data FeedPageData) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  ")
 		if err != nil {
 			return err
 		}
-		err = Layout("Home / Gox Social", data.CurrentUser, gox.ComponentFunc(func(w io.Writer) error {
+		err = Layout("Home / Gox Social", gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 			var err error
 			_ = err
 			_, err = io.WriteString(w, "\n    ")
 			if err != nil {
 				return err
 			}
-			err = PageHeader("Home").Render(w)
+			err = PageHeader("Home").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -74,7 +75,7 @@ func FeedPage(data FeedPageData) gox.Component {
 			if err != nil {
 				return err
 			}
-			err = ComposeBox("/posts", "What is happening?!", "Post", data.CurrentUser).Render(w)
+			err = ComposeBox("/posts", "What is happening?!", "Post").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -87,7 +88,7 @@ func FeedPage(data FeedPageData) gox.Component {
 				if err != nil {
 					return err
 				}
-				err = EmptyState("No posts yet. Follow some users or create your first post!").Render(w)
+				err = EmptyState("No posts yet. Follow some users or create your first post!").Render(ctx, w)
 				if err != nil {
 					return err
 				}
@@ -105,7 +106,7 @@ func FeedPage(data FeedPageData) gox.Component {
 					if err != nil {
 						return err
 					}
-					err = PostCard(post, data.CurrentUser).Render(w)
+					err = PostCard(post).Render(ctx, w)
 					if err != nil {
 						return err
 					}
@@ -124,7 +125,7 @@ func FeedPage(data FeedPageData) gox.Component {
 				return err
 			}
 			return nil
-		})).Render(w)
+		})).Render(ctx, w)
 		if err != nil {
 			return err
 		}
@@ -137,21 +138,21 @@ func FeedPage(data FeedPageData) gox.Component {
 }
 
 func ExplorePage(data ExploreData) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  ")
 		if err != nil {
 			return err
 		}
-		err = Layout("Explore / Gox Social", data.CurrentUser, gox.ComponentFunc(func(w io.Writer) error {
+		err = Layout("Explore / Gox Social", gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 			var err error
 			_ = err
 			_, err = io.WriteString(w, "\n    ")
 			if err != nil {
 				return err
 			}
-			err = PageHeader("Explore").Render(w)
+			err = PageHeader("Explore").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -169,7 +170,7 @@ func ExplorePage(data ExploreData) gox.Component {
 					if err != nil {
 						return err
 					}
-					err = UserCard(user).Render(w)
+					err = UserCard(user).Render(ctx, w)
 					if err != nil {
 						return err
 					}
@@ -192,7 +193,7 @@ func ExplorePage(data ExploreData) gox.Component {
 				if err != nil {
 					return err
 				}
-				err = EmptyState("No posts yet. Be the first to post!").Render(w)
+				err = EmptyState("No posts yet. Be the first to post!").Render(ctx, w)
 				if err != nil {
 					return err
 				}
@@ -210,7 +211,7 @@ func ExplorePage(data ExploreData) gox.Component {
 					if err != nil {
 						return err
 					}
-					err = PostCard(post, data.CurrentUser).Render(w)
+					err = PostCard(post).Render(ctx, w)
 					if err != nil {
 						return err
 					}
@@ -229,7 +230,7 @@ func ExplorePage(data ExploreData) gox.Component {
 				return err
 			}
 			return nil
-		})).Render(w)
+		})).Render(ctx, w)
 		if err != nil {
 			return err
 		}

@@ -1,6 +1,7 @@
 package views
 
 import (
+	"context"
 	"fmt"
 	"github.com/buemura/gox"
 	"html"
@@ -8,8 +9,8 @@ import (
 	"strconv"
 )
 
-func Layout(title string, currentUser User, children gox.Component) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+func Layout(title string, children gox.Component) gox.Component {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <!DOCTYPE html>\n  <html lang=\"en\">\n    <head>\n      <meta charset=\"UTF-8\" />\n      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n      <title>")
@@ -40,12 +41,12 @@ func Layout(title string, currentUser User, children gox.Component) gox.Componen
 		if err != nil {
 			return err
 		}
-		if currentUser.ID > 0 {
+		if CurrentUser(ctx).ID > 0 {
 			_, err = io.WriteString(w, "\n              <a href=\"")
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", "/user/"+currentUser.Username)))
+			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", "/user/"+CurrentUser(ctx).Username)))
 			if err != nil {
 				return err
 			}
@@ -58,12 +59,12 @@ func Layout(title string, currentUser User, children gox.Component) gox.Componen
 		if err != nil {
 			return err
 		}
-		if currentUser.ID > 0 {
+		if CurrentUser(ctx).ID > 0 {
 			_, err = io.WriteString(w, "\n            <div class=\"mt-auto mb-3 w-[250px]\">\n              <a href=\"")
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", "/user/"+currentUser.Username)))
+			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", "/user/"+CurrentUser(ctx).Username)))
 			if err != nil {
 				return err
 			}
@@ -71,7 +72,7 @@ func Layout(title string, currentUser User, children gox.Component) gox.Componen
 			if err != nil {
 				return err
 			}
-			err = Avatar(currentUser.Username, "sm").Render(w)
+			err = Avatar(CurrentUser(ctx).Username, "sm").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -79,7 +80,7 @@ func Layout(title string, currentUser User, children gox.Component) gox.Componen
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", currentUser.DisplayName)))
+			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", CurrentUser(ctx).DisplayName)))
 			if err != nil {
 				return err
 			}
@@ -87,7 +88,7 @@ func Layout(title string, currentUser User, children gox.Component) gox.Componen
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", currentUser.Username)))
+			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", CurrentUser(ctx).Username)))
 			if err != nil {
 				return err
 			}
@@ -101,7 +102,7 @@ func Layout(title string, currentUser User, children gox.Component) gox.Componen
 			return err
 		}
 		if children != nil {
-			err = children.Render(w)
+			err = children.Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -110,12 +111,12 @@ func Layout(title string, currentUser User, children gox.Component) gox.Componen
 		if err != nil {
 			return err
 		}
-		if currentUser.ID > 0 {
+		if CurrentUser(ctx).ID > 0 {
 			_, err = io.WriteString(w, "\n          <a href=\"")
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", "/user/"+currentUser.Username)))
+			_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", "/user/"+CurrentUser(ctx).Username)))
 			if err != nil {
 				return err
 			}
@@ -133,7 +134,7 @@ func Layout(title string, currentUser User, children gox.Component) gox.Componen
 }
 
 func AuthLayout(title string, children gox.Component) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <!DOCTYPE html>\n  <html lang=\"en\">\n    <head>\n      <meta charset=\"UTF-8\" />\n      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n      <title>")
@@ -157,7 +158,7 @@ func AuthLayout(title string, children gox.Component) gox.Component {
 			return err
 		}
 		if children != nil {
-			err = children.Render(w)
+			err = children.Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -171,7 +172,7 @@ func AuthLayout(title string, children gox.Component) gox.Component {
 }
 
 func PageHeader(title string) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <div class=\"sticky top-0 px-4 py-3 flex items-center gap-6 backdrop-blur-md\" style=\"background:rgba(0,0,0,0.65);z-index:40;border-bottom:1px solid #2f3336\">\n    <h1 class=\"text-xl font-bold\" style=\"color:#e7e9ea\">")
@@ -191,7 +192,7 @@ func PageHeader(title string) gox.Component {
 }
 
 func PageHeaderWithBack(title string, backURL string) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <div class=\"sticky top-0 px-4 py-1 flex items-center gap-6 backdrop-blur-md\" style=\"background:rgba(0,0,0,0.65);z-index:40;border-bottom:1px solid #2f3336\">\n    <a href=\"")

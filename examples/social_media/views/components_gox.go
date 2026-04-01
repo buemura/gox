@@ -1,6 +1,7 @@
 package views
 
 import (
+	"context"
 	"fmt"
 	"github.com/buemura/gox"
 	"html"
@@ -8,7 +9,7 @@ import (
 )
 
 func Avatar(username string, size string) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  ")
@@ -89,7 +90,7 @@ func Avatar(username string, size string) gox.Component {
 }
 
 func EmptyState(message string) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <div class=\"flex flex-col items-center justify-center py-16 px-4\">\n    <svg class=\"w-12 h-12 mb-4\" style=\"color:#2f3336\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\">\n      <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\" d=\"M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z\" />\n    </svg>\n    <p style=\"color:#71767b\" class=\"text-base\">")
@@ -109,7 +110,7 @@ func EmptyState(message string) gox.Component {
 }
 
 func UserCard(user User) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <a href=\"")
@@ -124,7 +125,7 @@ func UserCard(user User) gox.Component {
 		if err != nil {
 			return err
 		}
-		err = Avatar(user.Username, "sm").Render(w)
+		err = Avatar(user.Username, "sm").Render(ctx, w)
 		if err != nil {
 			return err
 		}

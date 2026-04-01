@@ -7,10 +7,6 @@ import (
 	"github.com/buemura/gox/examples/social_media/views"
 )
 
-type contextKey string
-
-const userContextKey contextKey = "user"
-
 func requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := getCurrentUser(r)
@@ -18,7 +14,7 @@ func requireAuth(next http.HandlerFunc) http.HandlerFunc {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
-		ctx := context.WithValue(r.Context(), userContextKey, user)
+		ctx := context.WithValue(r.Context(), views.UserContextKey, user)
 		next(w, r.WithContext(ctx))
 	}
 }
@@ -40,7 +36,7 @@ func getCurrentUser(r *http.Request) *views.User {
 }
 
 func userFromContext(r *http.Request) *views.User {
-	u, _ := r.Context().Value(userContextKey).(*views.User)
+	u, _ := r.Context().Value(views.UserContextKey).(*views.User)
 	return u
 }
 

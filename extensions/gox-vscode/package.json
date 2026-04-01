@@ -1,14 +1,15 @@
 {
   "name": "gox-vscode",
   "displayName": "Gox",
-  "description": "Syntax highlighting for Gox template files (.gox)",
-  "version": "0.1.0",
+  "description": "Gox template language support: syntax highlighting, diagnostics, go-to-definition, and hover",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.75.0"
   },
   "categories": [
     "Programming Languages"
   ],
+  "main": "./out/extension.js",
   "contributes": {
     "languages": [
       {
@@ -34,6 +35,23 @@
           "meta.embedded.block.css": "css"
         }
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Gox",
+      "properties": {
+        "gox.lsp.path": {
+          "type": "string",
+          "default": "gox",
+          "description": "Path to the gox binary. Defaults to 'gox' (found in PATH)."
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.0.0"
   }
 }

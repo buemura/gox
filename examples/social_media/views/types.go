@@ -41,20 +41,17 @@ type CommentData struct {
 }
 
 type FeedPageData struct {
-	CurrentUser User
-	Posts       []PostData
+	Posts []PostData
 }
 
 type PostDetailData struct {
-	CurrentUser User
-	Post        PostData
-	Thread      []PostData
-	Replies     []PostData
-	Comments    []CommentData
+	Post     PostData
+	Thread   []PostData
+	Replies  []PostData
+	Comments []CommentData
 }
 
 type ProfileData struct {
-	CurrentUser  User
 	ProfileUser  User
 	IsFollowing  bool
 	IsOwnProfile bool
@@ -62,7 +59,6 @@ type ProfileData struct {
 }
 
 type ExploreData struct {
-	CurrentUser    User
 	Posts          []PostData
 	SuggestedUsers []User
 }

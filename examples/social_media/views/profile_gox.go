@@ -1,6 +1,7 @@
 package views
 
 import (
+	"context"
 	"fmt"
 	"github.com/buemura/gox"
 	"html"
@@ -9,21 +10,21 @@ import (
 )
 
 func ProfilePage(data ProfileData) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  ")
 		if err != nil {
 			return err
 		}
-		err = Layout(data.ProfileUser.DisplayName+" (@"+data.ProfileUser.Username+") / Gox Social", data.CurrentUser, gox.ComponentFunc(func(w io.Writer) error {
+		err = Layout(data.ProfileUser.DisplayName+" (@"+data.ProfileUser.Username+") / Gox Social", gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 			var err error
 			_ = err
 			_, err = io.WriteString(w, "\n    ")
 			if err != nil {
 				return err
 			}
-			err = PageHeaderWithBack(data.ProfileUser.DisplayName, "/").Render(w)
+			err = PageHeaderWithBack(data.ProfileUser.DisplayName, "/").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -39,7 +40,7 @@ func ProfilePage(data ProfileData) gox.Component {
 			if err != nil {
 				return err
 			}
-			err = Avatar(data.ProfileUser.Username, "lg").Render(w)
+			err = Avatar(data.ProfileUser.Username, "lg").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -140,7 +141,7 @@ func ProfilePage(data ProfileData) gox.Component {
 				if err != nil {
 					return err
 				}
-				err = EmptyState("No posts yet.").Render(w)
+				err = EmptyState("No posts yet.").Render(ctx, w)
 				if err != nil {
 					return err
 				}
@@ -158,7 +159,7 @@ func ProfilePage(data ProfileData) gox.Component {
 					if err != nil {
 						return err
 					}
-					err = PostCard(post, data.CurrentUser).Render(w)
+					err = PostCard(post).Render(ctx, w)
 					if err != nil {
 						return err
 					}
@@ -177,7 +178,7 @@ func ProfilePage(data ProfileData) gox.Component {
 				return err
 			}
 			return nil
-		})).Render(w)
+		})).Render(ctx, w)
 		if err != nil {
 			return err
 		}

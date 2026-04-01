@@ -1,16 +1,16 @@
 package views
 
 import (
+	"context"
 	"fmt"
+	"github.com/buemura/gox"
 	"html"
 	"io"
 	"strconv"
-
-	"github.com/buemura/gox"
 )
 
 func Layout(title string, children gox.Component) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <!DOCTYPE html>\n  <html lang=\"en\">\n    <head>\n      <meta charset=\"UTF-8\" />\n      <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n      <title>")
@@ -26,7 +26,7 @@ func Layout(title string, children gox.Component) gox.Component {
 			return err
 		}
 		if children != nil {
-			err = children.Render(w)
+			err = children.Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -40,7 +40,7 @@ func Layout(title string, children gox.Component) gox.Component {
 }
 
 func TodoItem(id int, text string, done bool) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <li class=\"")
@@ -59,22 +59,25 @@ func TodoItem(id int, text string, done bool) gox.Component {
 		if err != nil {
 			return err
 		}
-		_, err = io.WriteString(w, "\" />\n      ")
+		_, err = io.WriteString(w, "\" />\n      <button type=\"submit\" class=\"flex items-center justify-center w-6 h-6 rounded-full border-2 cursor-pointer transition-colors hover:border-indigo-400\" style=\"")
+		if err != nil {
+			return err
+		}
+		_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", todoCheckStyle(done))))
+		if err != nil {
+			return err
+		}
+		_, err = io.WriteString(w, "\">\n        ")
 		if err != nil {
 			return err
 		}
 		if done {
-			_, err = io.WriteString(w, "\n        <button type=\"submit\" class=\"text-lg\">&#x2705;</button>\n      ")
-			if err != nil {
-				return err
-			}
-		} else {
-			_, err = io.WriteString(w, "\n        <button type=\"submit\" class=\"text-lg\">&#x2B1C;</button>\n      ")
+			_, err = io.WriteString(w, "\n          <svg class=\"w-3.5 h-3.5 text-white\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" stroke-width=\"3\">\n            <path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M5 13l4 4L19 7\" />\n          </svg>\n        ")
 			if err != nil {
 				return err
 			}
 		}
-		_, err = io.WriteString(w, "\n    </form>\n    <span class=\"")
+		_, err = io.WriteString(w, "\n      </button>\n    </form>\n    <span class=\"")
 		if err != nil {
 			return err
 		}
@@ -107,14 +110,14 @@ func TodoItem(id int, text string, done bool) gox.Component {
 }
 
 func TodoList(todos []Todo) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  ")
 		if err != nil {
 			return err
 		}
-		err = Layout("Gox Todo App", gox.ComponentFunc(func(w io.Writer) error {
+		err = Layout("Gox Todo App", gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 			var err error
 			_ = err
 			_, err = io.WriteString(w, "\n    <h1 class=\"text-2xl font-bold text-gray-800 mb-5\">Todo App</h1>\n    <form class=\"flex gap-2 mb-6\" method=\"POST\" action=\"/add\">\n      <input type=\"text\" name=\"text\" placeholder=\"What needs to be done?\" required class=\"flex-1 px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\" />\n      <button type=\"submit\" class=\"px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-base font-medium cursor-pointer\">Add</button>\n    </form>\n    ")
@@ -136,7 +139,7 @@ func TodoList(todos []Todo) gox.Component {
 					if err != nil {
 						return err
 					}
-					err = TodoItem(todo.ID, todo.Text, todo.Done).Render(w)
+					err = TodoItem(todo.ID, todo.Text, todo.Done).Render(ctx, w)
 					if err != nil {
 						return err
 					}
@@ -145,7 +148,25 @@ func TodoList(todos []Todo) gox.Component {
 						return err
 					}
 				}
-				_, err = io.WriteString(w, "\n      </ul>\n    ")
+				_, err = io.WriteString(w, "\n      </ul>\n      <div class=\"mt-6 flex items-center justify-between text-sm text-gray-500 px-1\">\n        <span>")
+				if err != nil {
+					return err
+				}
+				_, err = io.WriteString(w, html.EscapeString(fmt.Sprintf("%v", strconv.Itoa(todoActiveCount(todos)))))
+				if err != nil {
+					return err
+				}
+				_, err = io.WriteString(w, " items left</span>\n        <label class=\"flex items-center gap-2 cursor-pointer select-none\">\n          <input type=\"checkbox\"")
+				if err != nil {
+					return err
+				}
+				if todoAllDone(todos) {
+					_, err = io.WriteString(w, " checked")
+					if err != nil {
+						return err
+					}
+				}
+				_, err = io.WriteString(w, " disabled class=\"w-4 h-4 rounded border-gray-300 text-indigo-600\" />\n          <span>All complete</span>\n        </label>\n      </div>\n    ")
 				if err != nil {
 					return err
 				}
@@ -155,7 +176,7 @@ func TodoList(todos []Todo) gox.Component {
 				return err
 			}
 			return nil
-		})).Render(w)
+		})).Render(ctx, w)
 		if err != nil {
 			return err
 		}

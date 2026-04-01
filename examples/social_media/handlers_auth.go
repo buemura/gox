@@ -14,7 +14,7 @@ func handleLoginPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	views.LoginPage("").Render(w)
+	views.LoginPage("").Render(r.Context(), w)
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -24,20 +24,20 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	user, hash, err := getUserByUsername(username)
 	if err != nil {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		views.LoginPage("Invalid username or password.").Render(w)
+		views.LoginPage("Invalid username or password.").Render(r.Context(), w)
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)); err != nil {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		views.LoginPage("Invalid username or password.").Render(w)
+		views.LoginPage("Invalid username or password.").Render(r.Context(), w)
 		return
 	}
 
 	token, err := createSession(user.ID)
 	if err != nil {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		views.LoginPage("Something went wrong. Please try again.").Render(w)
+		views.LoginPage("Something went wrong. Please try again.").Render(r.Context(), w)
 		return
 	}
 
@@ -51,7 +51,7 @@ func handleRegisterPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	views.RegisterPage("").Render(w)
+	views.RegisterPage("").Render(r.Context(), w)
 }
 
 func handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -62,20 +62,20 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	if displayName == "" || username == "" || email == "" || password == "" {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		views.RegisterPage("All fields are required.").Render(w)
+		views.RegisterPage("All fields are required.").Render(r.Context(), w)
 		return
 	}
 
 	if len(password) < 6 {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		views.RegisterPage("Password must be at least 6 characters.").Render(w)
+		views.RegisterPage("Password must be at least 6 characters.").Render(r.Context(), w)
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		views.RegisterPage("Something went wrong. Please try again.").Render(w)
+		views.RegisterPage("Something went wrong. Please try again.").Render(r.Context(), w)
 		return
 	}
 
@@ -86,14 +86,14 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 			msg = "Username or email already taken."
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		views.RegisterPage(msg).Render(w)
+		views.RegisterPage(msg).Render(r.Context(), w)
 		return
 	}
 
 	token, err := createSession(int(userID))
 	if err != nil {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		views.LoginPage("Account created! Please sign in.").Render(w)
+		views.LoginPage("Account created! Please sign in.").Render(r.Context(), w)
 		return
 	}
 

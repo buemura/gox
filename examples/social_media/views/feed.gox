@@ -1,8 +1,8 @@
 package views
 
-func ComposeBox(action string, placeholder string, buttonText string, currentUser User) {
+func ComposeBox(action string, placeholder string, buttonText string) {
   <div class="px-4 py-3 flex gap-3" style="border-bottom:1px solid #2f3336">
-    <Avatar username={{ currentUser.Username }} size="md" />
+    <Avatar username={{ CurrentUser(ctx).Username }} size="md" />
     <form method="POST" action={{ action }} class="flex-1 flex flex-col">
       <textarea name="content" rows="3" placeholder={{ placeholder }} required class="w-full bg-transparent text-xl py-3 placeholder-opacity-60" style="color:#e7e9ea;border:none" onfocus="this.parentElement.querySelector('button').style.opacity='1'"></textarea>
       <div class="flex justify-end pt-3" style="border-top:1px solid #2f3336">
@@ -15,21 +15,21 @@ func ComposeBox(action string, placeholder string, buttonText string, currentUse
 }
 
 func FeedPage(data FeedPageData) {
-  <Layout title="Home / Gox Social" currentUser={{ data.CurrentUser }}>
+  <Layout title="Home / Gox Social">
     <PageHeader title="Home" />
-    <ComposeBox action="/posts" placeholder="What is happening?!" buttonText="Post" currentUser={{ data.CurrentUser }} />
+    <ComposeBox action="/posts" placeholder="What is happening?!" buttonText="Post" />
     {{ if len(data.Posts) == 0 }}
       <EmptyState message="No posts yet. Follow some users or create your first post!" />
     {{ else }}
       {{ for _, post := range data.Posts }}
-        <PostCard post={{ post }} currentUser={{ data.CurrentUser }} />
+        <PostCard post={{ post }} />
       {{ end }}
     {{ end }}
   </Layout>
 }
 
 func ExplorePage(data ExploreData) {
-  <Layout title="Explore / Gox Social" currentUser={{ data.CurrentUser }}>
+  <Layout title="Explore / Gox Social">
     <PageHeader title="Explore" />
 
     {{ if len(data.SuggestedUsers) > 0 }}
@@ -45,7 +45,7 @@ func ExplorePage(data ExploreData) {
       <EmptyState message="No posts yet. Be the first to post!" />
     {{ else }}
       {{ for _, post := range data.Posts }}
-        <PostCard post={{ post }} currentUser={{ data.CurrentUser }} />
+        <PostCard post={{ post }} />
       {{ end }}
     {{ end }}
   </Layout>

@@ -8,6 +8,11 @@ import (
 	"github.com/buemura/gox/pkg/parser"
 )
 
+// urlAttrs are attributes whose dynamic values require URL sanitization.
+var urlAttrs = map[string]bool{
+	"href": true, "src": true, "action": true, "formaction": true,
+}
+
 // Compiler walks an AST and emits Go source code.
 type Compiler struct {
 	buf       strings.Builder
@@ -67,6 +72,7 @@ func (c *Compiler) compileFile(file *parser.File) {
 
 	// Collect required imports
 	requiredImports := map[string]bool{
+		"context":                     true,
 		"io":                          true,
 		"fmt":                         true,
 		"html":                        true,
@@ -83,6 +89,7 @@ func (c *Compiler) compileFile(file *parser.File) {
 	}
 	if needsSort {
 		requiredImports["sort"] = true
+		requiredImports["strings"] = true
 	}
 
 	// Merge user imports (strip quotes since parser preserves them from source)
@@ -156,7 +163,7 @@ func (c *Compiler) compileComponent(comp *parser.ComponentDecl) {
 
 	c.writef("func %s(%s) gox.Component {\n", comp.Name, params)
 	c.indent++
-	c.writeLine("return gox.ComponentFunc(func(w io.Writer) error {")
+	c.writeLine("return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {")
 	c.indent++
 	c.writeLine("var err error")
 	c.writeLine("_ = err")
@@ -251,6 +258,20 @@ func (c *Compiler) emitWriteRawExpr(expr string) {
 	c.writeLine("if err != nil { return err }")
 }
 
+func (c *Compiler) emitWriteSanitizedURL(expr string) {
+	c.writeIndent()
+	c.writef("_, err = io.WriteString(w, gox.SanitizeURL(%s))\n", expr)
+	c.writeIndent()
+	c.writeLine("if err != nil { return err }")
+}
+
+func (c *Compiler) emitWriteSanitizedCSS(expr string) {
+	c.writeIndent()
+	c.writef("_, err = io.WriteString(w, gox.SanitizeCSS(%s))\n", expr)
+	c.writeIndent()
+	c.writeLine("if err != nil { return err }")
+}
+
 func (c *Compiler) compileTextNode(n *parser.TextNode) {
 	if n.Content == "" {
 		return
@@ -287,7 +308,14 @@ func (c *Compiler) compileHTMLElement(el *parser.HTMLElement) {
 		} else if attr.Dynamic {
 			c.appendStatic(fmt.Sprintf(` %s="`, attr.Name))
 			c.flushStatic()
-			c.emitWriteExpr(attr.Value)
+			attrLower := strings.ToLower(attr.Name)
+			if urlAttrs[attrLower] {
+				c.emitWriteSanitizedURL(attr.Value)
+			} else if attrLower == "style" {
+				c.emitWriteSanitizedCSS(attr.Value)
+			} else {
+				c.emitWriteExpr(attr.Value)
+			}
 			c.appendStatic(`"`)
 		} else {
 			// Static attribute - accumulate
@@ -352,8 +380,28 @@ func (c *Compiler) compileSpreadAttr(attr parser.Attribute) {
 	c.writeLine("} else {")
 	c.indent++
 	c.writeIndent()
+	c.write("__kLower := strings.ToLower(__k)\n")
+	c.writeIndent()
+	c.writeLine(`if __kLower == "href" || __kLower == "src" || __kLower == "action" || __kLower == "formaction" {`)
+	c.indent++
+	c.writeIndent()
+	c.write(`_, err = io.WriteString(w, fmt.Sprintf(" %s=\"%s\"", __k, gox.SanitizeURL(__v)))`)
+	c.write("\n")
+	c.indent--
+	c.writeIndent()
+	c.writeLine(`} else if __kLower == "style" {`)
+	c.indent++
+	c.writeIndent()
+	c.write(`_, err = io.WriteString(w, fmt.Sprintf(" %s=\"%s\"", __k, gox.SanitizeCSS(__v)))`)
+	c.write("\n")
+	c.indent--
+	c.writeLine("} else {")
+	c.indent++
+	c.writeIndent()
 	c.write(`_, err = io.WriteString(w, fmt.Sprintf(" %s=\"%v\"", __k, __v))`)
 	c.write("\n")
+	c.indent--
+	c.writeLine("}")
 	c.writeIndent()
 	c.writeLine("if err != nil { return err }")
 	c.indent--
@@ -432,7 +480,7 @@ func (c *Compiler) compileComponentCall(call *parser.ComponentCall) {
 	}
 
 	c.writeIndent()
-	c.writef("err = %s(%s).Render(w)\n", call.Name, strings.Join(args, ", "))
+	c.writef("err = %s(%s).Render(ctx, w)\n", call.Name, strings.Join(args, ", "))
 	c.writeIndent()
 	c.writeLine("if err != nil { return err }")
 }
@@ -444,7 +492,7 @@ func (c *Compiler) buildChildrenComponent(nodes []parser.Node) string {
 	inner.flushStatic()
 
 	var b strings.Builder
-	b.WriteString("gox.ComponentFunc(func(w io.Writer) error {\n")
+	b.WriteString("gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {\n")
 	b.WriteString("\t\tvar err error\n")
 	b.WriteString("\t\t_ = err\n")
 	b.WriteString(inner.buf.String())
@@ -457,7 +505,7 @@ func (c *Compiler) compileChildrenNode() {
 	c.flushStatic()
 	c.writeLine("if children != nil {")
 	c.indent++
-	c.writeLine("err = children.Render(w)")
+	c.writeLine("err = children.Render(ctx, w)")
 	c.writeLine("if err != nil { return err }")
 	c.indent--
 	c.writeLine("}")

@@ -3,7 +3,7 @@ package views
 import "strconv"
 import "fmt"
 
-func PostCard(post PostData, currentUser User) {
+func PostCard(post PostData) {
   <article class="flex gap-3 px-4 py-3 transition-colors cursor-pointer" style="border-bottom:1px solid #2f3336" onmouseover="this.style.backgroundColor='rgba(231,233,234,0.03)'" onmouseout="this.style.backgroundColor='transparent'">
     <a href={{ "/user/" + post.Username }} onclick="event.stopPropagation()" style="text-decoration:none;flex-shrink:0">
       <Avatar username={{ post.Username }} size="md" />
@@ -66,7 +66,7 @@ func PostCard(post PostData, currentUser User) {
           </button>
         </form>
 
-        {{ if post.UserID == currentUser.ID }}
+        {{ if post.UserID == CurrentUser(ctx).ID }}
           <form method="POST" action={{ fmt.Sprintf("/post/%d/delete", post.ID) }} class="inline" onclick="event.stopPropagation()">
             <button type="submit" class="flex items-center group" onclick="return confirm('Delete this post?')">
               <div class="p-2 rounded-full transition-colors group-hover:bg-red-500/10">
@@ -83,7 +83,7 @@ func PostCard(post PostData, currentUser User) {
 }
 
 func PostDetailPage(data PostDetailData) {
-  <Layout title="Post / Gox Social" currentUser={{ data.CurrentUser }}>
+  <Layout title="Post / Gox Social">
     <PageHeaderWithBack title="Post" backURL="/" />
 
     {{ for _, parent := range data.Thread }}
@@ -150,12 +150,12 @@ func PostDetailPage(data PostDetailData) {
     </article>
 
     <div style="border-bottom:1px solid #2f3336">
-      <ComposeBox action={{ fmt.Sprintf("/post/%d/reply", data.Post.ID) }} placeholder="Post your reply" buttonText="Reply" currentUser={{ data.CurrentUser }} />
+      <ComposeBox action={{ fmt.Sprintf("/post/%d/reply", data.Post.ID) }} placeholder="Post your reply" buttonText="Reply" />
     </div>
 
     {{ if len(data.Replies) > 0 }}
       {{ for _, reply := range data.Replies }}
-        <PostCard post={{ reply }} currentUser={{ data.CurrentUser }} />
+        <PostCard post={{ reply }} />
       {{ end }}
     {{ end }}
 
@@ -170,7 +170,7 @@ func PostDetailPage(data PostDetailData) {
 
     <div class="px-4 py-3" style="border-bottom:1px solid #2f3336">
       <form method="POST" action={{ fmt.Sprintf("/post/%d/comment", data.Post.ID) }} class="flex gap-3">
-        <Avatar username={{ data.CurrentUser.Username }} size="sm" />
+        <Avatar username={{ CurrentUser(ctx).Username }} size="sm" />
         <div class="flex-1">
           <textarea name="content" rows="2" placeholder="Add a comment..." required class="w-full bg-transparent text-[15px] py-2" style="color:#e7e9ea;border:none"></textarea>
           <div class="flex justify-end">

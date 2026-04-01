@@ -397,6 +397,31 @@ func (p *Parser) parseAttribute() (Attribute, error) {
 	attrName := nameTok.Value
 	line, col := nameTok.Line, nameTok.Col
 
+	// Conditional boolean: name?={{ expr }}
+	isBooleanCond := strings.HasSuffix(attrName, "?=")
+	if isBooleanCond {
+		attrName = strings.TrimSuffix(attrName, "?=")
+		if p.current.Type == TokenExprOpen {
+			p.advance() // consume ExprOpen
+			if p.current.Type == TokenGoCode {
+				codeTok := p.advance()
+				if p.current.Type == TokenExprClose {
+					p.advance()
+				}
+				return Attribute{
+					Name:    attrName,
+					Value:   strings.TrimSpace(codeTok.Value),
+					Dynamic: true,
+					Boolean: true,
+					Line:    line,
+					Col:     col,
+				}, nil
+			}
+			return Attribute{}, p.errorf("expected Go expression in conditional boolean attribute")
+		}
+		return Attribute{}, p.errorf("conditional boolean attribute %q requires a dynamic expression (e.g., %s?={{ expr }})", attrName, attrName)
+	}
+
 	hasValue := strings.HasSuffix(attrName, "=")
 	if hasValue {
 		attrName = strings.TrimSuffix(attrName, "=")

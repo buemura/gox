@@ -197,13 +197,14 @@ func Hello(name string) {
 	mainContent := `package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/buemura/gox"
 	"testapp/views"
 )
 
 func main() {
-	s, err := gox.RenderToString(views.Hello("World"))
+	s, err := gox.RenderToString(context.Background(), views.Hello("World"))
 	if err != nil {
 		panic(err)
 	}

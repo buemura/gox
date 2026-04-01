@@ -17,6 +17,8 @@ type Config struct {
 	Root      string
 	OutSuffix string
 	Debounce  time.Duration
+	// OnReload is called after a successful compilation. May be nil.
+	OnReload func()
 }
 
 // Watcher watches for .gox file changes and triggers recompilation.
@@ -165,5 +167,8 @@ func (w *Watcher) compileAndLog(path string) {
 		fmt.Fprintf(os.Stderr, "[watch] error: %v\n", err)
 	} else {
 		fmt.Fprintf(os.Stderr, "[watch] compiled %s\n", path)
+		if w.cfg.OnReload != nil {
+			w.cfg.OnReload()
+		}
 	}
 }

@@ -310,6 +310,14 @@ func (l *Lexer) lexTag() Token {
 func (l *Lexer) lexAttrName(line, col int) Token {
 	name := l.readWhile(isAttrNameChar)
 
+	// Conditional boolean: name?={{ expr }}
+	if !l.isAtEnd() && l.peek() == '?' && l.peekAt(1) == '=' {
+		l.advance() // consume '?'
+		l.advance() // consume '='
+		l.state = stateAttrValue
+		return Token{Type: TokenAttrName, Value: name + "?=", Line: line, Col: col}
+	}
+
 	if !l.isAtEnd() && l.peek() == '=' {
 		l.advance() // consume '='
 		l.state = stateAttrValue

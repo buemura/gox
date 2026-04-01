@@ -43,10 +43,9 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	views.ProfilePage(views.ProfileData{
-		CurrentUser:  *user,
 		ProfileUser:  *profileUser,
 		IsFollowing:  following,
 		IsOwnProfile: user.ID == profileUser.ID,
 		Posts:        posts,
-	}).Render(w)
+	}).Render(r.Context(), w)
 }

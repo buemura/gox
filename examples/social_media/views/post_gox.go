@@ -1,6 +1,7 @@
 package views
 
 import (
+	"context"
 	"fmt"
 	"github.com/buemura/gox"
 	"html"
@@ -8,8 +9,8 @@ import (
 	"strconv"
 )
 
-func PostCard(post PostData, currentUser User) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+func PostCard(post PostData) gox.Component {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <article class=\"flex gap-3 px-4 py-3 transition-colors cursor-pointer\" style=\"border-bottom:1px solid #2f3336\" onmouseover=\"this.style.backgroundColor='rgba(231,233,234,0.03)'\" onmouseout=\"this.style.backgroundColor='transparent'\">\n    <a href=\"")
@@ -24,7 +25,7 @@ func PostCard(post PostData, currentUser User) gox.Component {
 		if err != nil {
 			return err
 		}
-		err = Avatar(post.Username, "md").Render(w)
+		err = Avatar(post.Username, "md").Render(ctx, w)
 		if err != nil {
 			return err
 		}
@@ -216,7 +217,7 @@ func PostCard(post PostData, currentUser User) gox.Component {
 		if err != nil {
 			return err
 		}
-		if post.UserID == currentUser.ID {
+		if post.UserID == CurrentUser(ctx).ID {
 			_, err = io.WriteString(w, "\n          <form method=\"POST\" action=\"")
 			if err != nil {
 				return err
@@ -239,21 +240,21 @@ func PostCard(post PostData, currentUser User) gox.Component {
 }
 
 func PostDetailPage(data PostDetailData) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  ")
 		if err != nil {
 			return err
 		}
-		err = Layout("Post / Gox Social", data.CurrentUser, gox.ComponentFunc(func(w io.Writer) error {
+		err = Layout("Post / Gox Social", gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 			var err error
 			_ = err
 			_, err = io.WriteString(w, "\n    ")
 			if err != nil {
 				return err
 			}
-			err = PageHeaderWithBack("Post", "/").Render(w)
+			err = PageHeaderWithBack("Post", "/").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -266,7 +267,7 @@ func PostDetailPage(data PostDetailData) gox.Component {
 				if err != nil {
 					return err
 				}
-				err = Avatar(parent.Username, "md").Render(w)
+				err = Avatar(parent.Username, "md").Render(ctx, w)
 				if err != nil {
 					return err
 				}
@@ -327,7 +328,7 @@ func PostDetailPage(data PostDetailData) gox.Component {
 			if err != nil {
 				return err
 			}
-			err = Avatar(data.Post.Username, "md").Render(w)
+			err = Avatar(data.Post.Username, "md").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -422,7 +423,7 @@ func PostDetailPage(data PostDetailData) gox.Component {
 			if err != nil {
 				return err
 			}
-			err = ComposeBox(fmt.Sprintf("/post/%d/reply", data.Post.ID), "Post your reply", "Reply", data.CurrentUser).Render(w)
+			err = ComposeBox(fmt.Sprintf("/post/%d/reply", data.Post.ID), "Post your reply", "Reply").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -440,7 +441,7 @@ func PostDetailPage(data PostDetailData) gox.Component {
 					if err != nil {
 						return err
 					}
-					err = PostCard(reply, data.CurrentUser).Render(w)
+					err = PostCard(reply).Render(ctx, w)
 					if err != nil {
 						return err
 					}
@@ -468,7 +469,7 @@ func PostDetailPage(data PostDetailData) gox.Component {
 					if err != nil {
 						return err
 					}
-					err = CommentItem(comment).Render(w)
+					err = CommentItem(comment).Render(ctx, w)
 					if err != nil {
 						return err
 					}
@@ -494,7 +495,7 @@ func PostDetailPage(data PostDetailData) gox.Component {
 			if err != nil {
 				return err
 			}
-			err = Avatar(data.CurrentUser.Username, "sm").Render(w)
+			err = Avatar(CurrentUser(ctx).Username, "sm").Render(ctx, w)
 			if err != nil {
 				return err
 			}
@@ -503,7 +504,7 @@ func PostDetailPage(data PostDetailData) gox.Component {
 				return err
 			}
 			return nil
-		})).Render(w)
+		})).Render(ctx, w)
 		if err != nil {
 			return err
 		}
@@ -516,7 +517,7 @@ func PostDetailPage(data PostDetailData) gox.Component {
 }
 
 func CommentItem(comment CommentData) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  <div class=\"flex gap-3 py-3\" style=\"border-bottom:1px solid rgba(47,51,54,0.5)\">\n    <a href=\"")
@@ -531,7 +532,7 @@ func CommentItem(comment CommentData) gox.Component {
 		if err != nil {
 			return err
 		}
-		err = Avatar(comment.Username, "sm").Render(w)
+		err = Avatar(comment.Username, "sm").Render(ctx, w)
 		if err != nil {
 			return err
 		}

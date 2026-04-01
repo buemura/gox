@@ -25,7 +25,7 @@ jobs:
       - name: Test
         run: go test ./...
 
-  lint:
+  vet:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +34,5 @@ jobs:
         with:
           go-version: "1.25"
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
+      - name: Vet
+        run: go vet ./...

@@ -1,6 +1,7 @@
 package views
 
 import (
+	"context"
 	"fmt"
 	"github.com/buemura/gox"
 	"html"
@@ -8,14 +9,14 @@ import (
 )
 
 func LoginPage(errorMsg string) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  ")
 		if err != nil {
 			return err
 		}
-		err = AuthLayout("Log in / Gox Social", gox.ComponentFunc(func(w io.Writer) error {
+		err = AuthLayout("Log in / Gox Social", gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 			var err error
 			_ = err
 			_, err = io.WriteString(w, "\n    <div class=\"w-full max-w-[364px] px-8\">\n      <div class=\"flex justify-center mb-8\">\n        <svg viewBox=\"0 0 24 24\" class=\"w-9 h-9\" fill=\"currentColor\" style=\"color:#e7e9ea\">\n          <path d=\"M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z\" />\n        </svg>\n      </div>\n\n      <h1 class=\"text-3xl font-bold mb-8\" style=\"color:#e7e9ea\">Sign in</h1>\n\n      ")
@@ -41,7 +42,7 @@ func LoginPage(errorMsg string) gox.Component {
 				return err
 			}
 			return nil
-		})).Render(w)
+		})).Render(ctx, w)
 		if err != nil {
 			return err
 		}
@@ -54,14 +55,14 @@ func LoginPage(errorMsg string) gox.Component {
 }
 
 func RegisterPage(errorMsg string) gox.Component {
-	return gox.ComponentFunc(func(w io.Writer) error {
+	return gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 		var err error
 		_ = err
 		_, err = io.WriteString(w, "\n  ")
 		if err != nil {
 			return err
 		}
-		err = AuthLayout("Create account / Gox Social", gox.ComponentFunc(func(w io.Writer) error {
+		err = AuthLayout("Create account / Gox Social", gox.ComponentFunc(func(ctx context.Context, w io.Writer) error {
 			var err error
 			_ = err
 			_, err = io.WriteString(w, "\n    <div class=\"w-full max-w-[364px] px-8\">\n      <div class=\"flex justify-center mb-8\">\n        <svg viewBox=\"0 0 24 24\" class=\"w-9 h-9\" fill=\"currentColor\" style=\"color:#e7e9ea\">\n          <path d=\"M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z\" />\n        </svg>\n      </div>\n\n      <h1 class=\"text-3xl font-bold mb-8\" style=\"color:#e7e9ea\">Create your account</h1>\n\n      ")
@@ -87,7 +88,7 @@ func RegisterPage(errorMsg string) gox.Component {
 				return err
 			}
 			return nil
-		})).Render(w)
+		})).Render(ctx, w)
 		if err != nil {
 			return err
 		}

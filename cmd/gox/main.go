@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strings"
@@ -12,7 +13,9 @@ import (
 
 	"github.com/buemura/gox/pkg/compiler"
 	"github.com/buemura/gox/pkg/formatter"
+	"github.com/buemura/gox/pkg/lsp"
 	"github.com/buemura/gox/pkg/parser"
+	"github.com/buemura/gox/pkg/proxy"
 	"github.com/buemura/gox/pkg/watcher"
 )
 
@@ -38,6 +41,11 @@ func main() {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
 		}
+	case "lsp":
+		if err := runLSP(); err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
 	default:
 		fmt.Fprintf(os.Stderr, "unknown command: %s\n", os.Args[1])
 		printUsage()
@@ -46,13 +54,34 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Fprintf(os.Stderr, "Usage: gox <command> [flags]\n\nCommands:\n  generate    Compile .gox files into Go source code\n  watch       Watch .gox files and recompile on changes\n  fmt         Format .gox files\n")
+	fmt.Fprintf(os.Stderr, `Usage: gox <command> [flags]
+
+Commands:
+  generate    Compile .gox files into Go source code
+  watch       Watch .gox files and recompile on changes
+  fmt         Format .gox files
+  lsp         Start the Language Server Protocol server
+
+Watch flags:
+  -proxy      Upstream URL to proxy (e.g. http://localhost:8080)
+  -proxyport  Port for the hot-reload proxy (default: 8081)
+  -cmd        Command to run/restart after recompilation (e.g. "go run .")
+`)
+}
+
+func runLSP() error {
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+	return lsp.Serve(ctx, os.Stdin, os.Stdout)
 }
 
 func runWatch(args []string) error {
 	fs := flag.NewFlagSet("watch", flag.ExitOnError)
 	dir := fs.String("dir", ".", "root directory to watch")
 	out := fs.String("out", "_gox.go", "output file suffix")
+	proxyUpstream := fs.String("proxy", "", "upstream URL to proxy (e.g. http://localhost:8080)")
+	proxyPort := fs.String("proxyport", "8081", "port for the hot-reload proxy server")
+	cmd := fs.String("cmd", "", "command to run/restart after recompilation (e.g. \"go run .\")")
 	fs.Parse(args)
 
 	// Initial full generate.
@@ -60,19 +89,68 @@ func runWatch(args []string) error {
 		fmt.Fprintf(os.Stderr, "initial generate: %v\n", err)
 	}
 
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+
 	cfg := watcher.Config{
 		Root:      *dir,
 		OutSuffix: *out,
 		Debounce:  100 * time.Millisecond,
 	}
 
+	// Set up hot-reload proxy if --proxy is specified.
+	if *proxyUpstream != "" {
+		srv, err := proxy.New(*proxyUpstream, ":"+*proxyPort)
+		if err != nil {
+			return fmt.Errorf("creating proxy: %w", err)
+		}
+		cfg.OnReload = srv.Reload
+		go func() {
+			fmt.Printf("proxy listening on http://localhost:%s → %s\n", *proxyPort, *proxyUpstream)
+			if err := srv.ListenAndServe(); err != nil {
+				fmt.Fprintf(os.Stderr, "proxy error: %v\n", err)
+			}
+		}()
+	}
+
+	// Set up --cmd process management if specified.
+	if *cmd != "" {
+		var cmdProc *exec.Cmd
+		prevOnReload := cfg.OnReload
+
+		startCmd := func() {
+			cmdProc = exec.CommandContext(ctx, "sh", "-c", *cmd)
+			cmdProc.Stdout = os.Stdout
+			cmdProc.Stderr = os.Stderr
+			if err := cmdProc.Start(); err != nil {
+				fmt.Fprintf(os.Stderr, "[cmd] failed to start: %v\n", err)
+			} else {
+				fmt.Fprintf(os.Stderr, "[cmd] started: %s (pid %d)\n", *cmd, cmdProc.Process.Pid)
+			}
+		}
+
+		// Start the command initially.
+		startCmd()
+
+		cfg.OnReload = func() {
+			// Kill previous process if running.
+			if cmdProc != nil && cmdProc.Process != nil {
+				cmdProc.Process.Kill()
+				cmdProc.Wait()
+			}
+			// Restart the command.
+			startCmd()
+			// Also trigger proxy reload if configured.
+			if prevOnReload != nil {
+				prevOnReload()
+			}
+		}
+	}
+
 	w, err := watcher.New(cfg, compileFile)
 	if err != nil {
 		return err
 	}
-
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer cancel()
 
 	fmt.Printf("watching %s for .gox changes...\n", *dir)
 	return w.Watch(ctx)

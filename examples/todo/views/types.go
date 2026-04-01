@@ -21,3 +21,32 @@ func todoTextClass(done bool) string {
 	}
 	return "flex-1 text-base text-gray-800"
 }
+
+func todoCheckStyle(done bool) string {
+	if done {
+		return "background:#4f46e5;border-color:#4f46e5"
+	}
+	return "border-color:#d1d5db;background:transparent"
+}
+
+func todoActiveCount(todos []Todo) int {
+	count := 0
+	for _, t := range todos {
+		if !t.Done {
+			count++
+		}
+	}
+	return count
+}
+
+func todoAllDone(todos []Todo) bool {
+	if len(todos) == 0 {
+		return false
+	}
+	for _, t := range todos {
+		if !t.Done {
+			return false
+		}
+	}
+	return true
+}

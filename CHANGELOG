@@ -1,0 +1,41 @@
+# Changelog
+
+## v0.1.1 (2026-03-31)
+
+### Features
+
+- **Context support**: `Component.Render` and all render functions now accept `context.Context`, enabling context propagation through the component tree
+- **LSP server**: New `gox lsp` command starts a Language Server Protocol server over stdio with hover, go-to-definition, and diagnostics support
+- **Hot-reload proxy**: `gox watch` gains `--proxy`, `--proxyport`, and `--cmd` flags for proxying to a backend app with automatic live-reload on recompilation
+- **Conditional boolean attributes**: New `name?={{ expr }}` syntax for conditionally rendering boolean HTML attributes
+- **Security: auto-sanitization**: Compiler automatically applies `SanitizeURL` for dynamic URL attributes (`href`, `src`, `action`, `formaction`) and `SanitizeCSS` for dynamic `style` values, including spread attributes
+- **Runtime helpers**: Added `SafeURL`, `SafeCSS` types, `SanitizeURL`, `SanitizeCSS`, and `EscapeString` functions to the runtime library
+
+### Bug Fixes & Improvements
+
+- Updated examples (todo, social_media) to use new context-aware API
+- Expanded test coverage for compiler, parser, lexer, and runtime
+- Improved CLI help output formatting
+
+---
+
+## v0.1.0 (2026-03-31)
+
+Initial public release of Gox — a template engine that compiles `.gox` files into pure Go code.
+
+### Features
+
+- **Lexer & Parser**: State-machine-based lexer and parser producing an AST from `.gox` template syntax
+- **Compiler**: Compiles AST into Go source code that writes HTML to an `io.Writer`, with automatic `go/format` formatting
+- **Code generation optimization**: Improved output for compiled templates
+- **CLI commands**: `generate`, `watch`, `fmt`, and `lsp` subcommands
+- **File watcher**: Auto-recompile on `.gox` file changes with configurable debounce
+- **VSCode extension**: Syntax highlighting and language support for `.gox` files
+- **Runtime library**: `Component` interface, `ComponentFunc` adapter, `Attrs`, `Raw`, `SafeURL`, `SafeCSS`, and sanitization helpers
+- **Security**: Auto-sanitization of dynamic URLs and CSS values in compiled output
+
+### Install
+
+```
+go install github.com/buemura/gox/cmd/gox@v0.1.0
+```

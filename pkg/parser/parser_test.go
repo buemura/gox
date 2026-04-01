@@ -825,3 +825,76 @@ func assertAttr(t *testing.T, attr Attribute, name, value string, dynamic, boole
 		t.Errorf("expected attr spread=%v, got %v", spread, attr.Spread)
 	}
 }
+
+func TestParseConditionalBooleanAttribute(t *testing.T) {
+	input := `package views
+
+func Button(isDisabled bool) {
+  <button disabled?={{ isDisabled }}>Submit</button>
+}`
+	p := NewParser(input)
+	file, err := p.Parse()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(file.Components) != 1 {
+		t.Fatalf("expected 1 component, got %d", len(file.Components))
+	}
+
+	body := file.Components[0].Body
+	// Find the HTML element (skip whitespace text nodes)
+	var elem *HTMLElement
+	for _, node := range body {
+		if e, ok := node.(*HTMLElement); ok {
+			elem = e
+			break
+		}
+	}
+	if elem == nil {
+		t.Fatal("expected HTMLElement in component body")
+	}
+	if elem.Tag != "button" {
+		t.Errorf("expected tag 'button', got %q", elem.Tag)
+	}
+	if len(elem.Attributes) != 1 {
+		t.Fatalf("expected 1 attribute, got %d", len(elem.Attributes))
+	}
+
+	attr := elem.Attributes[0]
+	assertAttr(t, attr, "disabled", "isDisabled", true, true, false)
+}
+
+func TestParseConditionalBooleanMultipleAttrs(t *testing.T) {
+	input := `package views
+
+func Input(isRequired bool, isReadonly bool) {
+  <input type="text" required?={{ isRequired }} readonly?={{ isReadonly }} />
+}`
+	p := NewParser(input)
+	file, err := p.Parse()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	body := file.Components[0].Body
+	var elem *HTMLElement
+	for _, node := range body {
+		if e, ok := node.(*HTMLElement); ok {
+			elem = e
+			break
+		}
+	}
+	if elem == nil {
+		t.Fatal("expected HTMLElement")
+	}
+	if len(elem.Attributes) != 3 {
+		t.Fatalf("expected 3 attributes, got %d", len(elem.Attributes))
+	}
+
+	// type="text" - static
+	assertAttr(t, elem.Attributes[0], "type", "text", false, false, false)
+	// required?={{ isRequired }} - conditional boolean
+	assertAttr(t, elem.Attributes[1], "required", "isRequired", true, true, false)
+	// readonly?={{ isReadonly }} - conditional boolean
+	assertAttr(t, elem.Attributes[2], "readonly", "isReadonly", true, true, false)
+}

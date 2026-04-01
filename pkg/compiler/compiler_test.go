@@ -282,7 +282,7 @@ func TestCompileComponentCall(t *testing.T) {
 	}
 
 	mustContain(t, src, "Header()")
-	mustContain(t, src, ".Render(w)")
+	mustContain(t, src, ".Render(ctx, w)")
 }
 
 func TestCompileComponentCallWithChildren(t *testing.T) {
@@ -339,7 +339,7 @@ func TestCompileChildrenSlot(t *testing.T) {
 
 	mustContain(t, src, "children gox.Component")
 	mustContain(t, src, "if children != nil {")
-	mustContain(t, src, "children.Render(w)")
+	mustContain(t, src, "children.Render(ctx, w)")
 }
 
 func TestCompileImports(t *testing.T) {
@@ -530,7 +530,7 @@ func Page() {
 	}
 
 	mustContain(t, src, "Header()")
-	mustContain(t, src, ".Render(w)")
+	mustContain(t, src, ".Render(ctx, w)")
 }
 
 // countWriteStrings counts the number of io.WriteString calls in the source.
@@ -700,8 +700,236 @@ func TestCoalescing_ComponentCallFlushes(t *testing.T) {
 
 	// <div> flushed before component call, </div> flushed at end
 	mustContain(t, src, `"<div>"`)
-	mustContain(t, src, "Header().Render(w)")
+	mustContain(t, src, "Header().Render(ctx, w)")
 	mustContain(t, src, `"</div>"`)
+}
+
+func TestCompileURLSanitization(t *testing.T) {
+	// Dynamic href should use gox.SanitizeURL
+	file := &parser.File{
+		Package: &parser.PackageDecl{Name: "views"},
+		Components: []*parser.ComponentDecl{
+			{
+				Name:   "Link",
+				Params: "url string",
+				Body: []parser.Node{
+					&parser.HTMLElement{
+						Tag: "a",
+						Attributes: []parser.Attribute{
+							{Name: "href", Value: "url", Dynamic: true},
+						},
+						Children: []parser.Node{
+							&parser.TextNode{Content: "Click"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "gox.SanitizeURL(url)")
+	mustNotContain(t, src, "html.EscapeString")
+}
+
+func TestCompileURLSanitizationSrcAttr(t *testing.T) {
+	file := &parser.File{
+		Package: &parser.PackageDecl{Name: "views"},
+		Components: []*parser.ComponentDecl{
+			{
+				Name:   "Image",
+				Params: "imgSrc string",
+				Body: []parser.Node{
+					&parser.HTMLElement{
+						Tag:       "img",
+						SelfClose: true,
+						Attributes: []parser.Attribute{
+							{Name: "src", Value: "imgSrc", Dynamic: true},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "gox.SanitizeURL(imgSrc)")
+}
+
+func TestCompileURLSanitizationActionAttr(t *testing.T) {
+	file := &parser.File{
+		Package: &parser.PackageDecl{Name: "views"},
+		Components: []*parser.ComponentDecl{
+			{
+				Name:   "Form",
+				Params: "target string",
+				Body: []parser.Node{
+					&parser.HTMLElement{
+						Tag: "form",
+						Attributes: []parser.Attribute{
+							{Name: "action", Value: "target", Dynamic: true},
+						},
+						Children: []parser.Node{
+							&parser.TextNode{Content: "Submit"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "gox.SanitizeURL(target)")
+}
+
+func TestCompileCSSSanitization(t *testing.T) {
+	file := &parser.File{
+		Package: &parser.PackageDecl{Name: "views"},
+		Components: []*parser.ComponentDecl{
+			{
+				Name:   "Styled",
+				Params: "css string",
+				Body: []parser.Node{
+					&parser.HTMLElement{
+						Tag: "div",
+						Attributes: []parser.Attribute{
+							{Name: "style", Value: "css", Dynamic: true},
+						},
+						Children: []parser.Node{
+							&parser.TextNode{Content: "content"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "gox.SanitizeCSS(css)")
+	mustNotContain(t, src, "html.EscapeString")
+}
+
+func TestCompileNonURLAttrStillEscapes(t *testing.T) {
+	// Non-URL attributes should still use html.EscapeString
+	file := &parser.File{
+		Package: &parser.PackageDecl{Name: "views"},
+		Components: []*parser.ComponentDecl{
+			{
+				Name:   "Div",
+				Params: "cls string",
+				Body: []parser.Node{
+					&parser.HTMLElement{
+						Tag: "div",
+						Attributes: []parser.Attribute{
+							{Name: "class", Value: "cls", Dynamic: true},
+						},
+						Children: []parser.Node{
+							&parser.TextNode{Content: "text"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "html.EscapeString")
+	mustNotContain(t, src, "gox.SanitizeURL")
+	mustNotContain(t, src, "gox.SanitizeCSS")
+}
+
+func TestCompileEndToEndURLSanitization(t *testing.T) {
+	input := `package views
+
+func Link(url string) {
+  <a href={{ url }}>Click</a>
+}
+`
+	p := parser.NewParser(input)
+	file, err := p.Parse()
+	if err != nil {
+		t.Fatalf("Parse error: %v", err)
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "gox.SanitizeURL(url)")
+}
+
+func TestCompileEndToEndCSSSanitization(t *testing.T) {
+	input := `package views
+
+func Box(css string) {
+  <div style={{ css }}>content</div>
+}
+`
+	p := parser.NewParser(input)
+	file, err := p.Parse()
+	if err != nil {
+		t.Fatalf("Parse error: %v", err)
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "gox.SanitizeCSS(css)")
+}
+
+func TestCompileSpreadWithURLSanitization(t *testing.T) {
+	file := &parser.File{
+		Package: &parser.PackageDecl{Name: "views"},
+		Components: []*parser.ComponentDecl{
+			{
+				Name:   "Link",
+				Params: "attrs gox.Attrs",
+				Body: []parser.Node{
+					&parser.HTMLElement{
+						Tag: "a",
+						Attributes: []parser.Attribute{
+							{Spread: true, Value: "attrs"},
+						},
+						Children: []parser.Node{
+							&parser.TextNode{Content: "Click"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "gox.SanitizeURL(__v)")
+	mustContain(t, src, "gox.SanitizeCSS(__v)")
+	mustContain(t, src, "strings.ToLower(__k)")
 }
 
 func mustContain(t *testing.T, src, substr string) {
@@ -716,4 +944,83 @@ func mustNotContain(t *testing.T, src, substr string) {
 	if strings.Contains(src, substr) {
 		t.Errorf("expected output NOT to contain %q\n\ngot:\n%s", substr, src)
 	}
+}
+
+func TestCompileConditionalBooleanAttribute(t *testing.T) {
+	file := &parser.File{
+		Package: &parser.PackageDecl{Name: "views"},
+		Components: []*parser.ComponentDecl{
+			{
+				Name:   "Button",
+				Params: "isDisabled bool",
+				Body: []parser.Node{
+					&parser.HTMLElement{
+						Tag: "button",
+						Attributes: []parser.Attribute{
+							{Name: "disabled", Boolean: true, Dynamic: true, Value: "isDisabled"},
+						},
+						Children: []parser.Node{
+							&parser.TextNode{Content: "Submit"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "if isDisabled {")
+	mustContain(t, src, `" disabled"`)
+	mustNotContain(t, src, `disabled="`)
+}
+
+func TestCompileEndToEndConditionalBoolean(t *testing.T) {
+	input := `package views
+
+func Button(isDisabled bool) {
+  <button disabled?={{ isDisabled }}>Submit</button>
+}
+`
+	p := parser.NewParser(input)
+	file, err := p.Parse()
+	if err != nil {
+		t.Fatalf("Parse error: %v", err)
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "func Button(isDisabled bool) gox.Component")
+	mustContain(t, src, "if isDisabled {")
+	mustContain(t, src, `" disabled"`)
+}
+
+func TestCompileEndToEndMultipleConditionalBooleans(t *testing.T) {
+	input := `package views
+
+func Input(req bool, ro bool) {
+  <input type="text" required?={{ req }} readonly?={{ ro }} />
+}
+`
+	p := parser.NewParser(input)
+	file, err := p.Parse()
+	if err != nil {
+		t.Fatalf("Parse error: %v", err)
+	}
+
+	src, err := Compile(file)
+	if err != nil {
+		t.Fatalf("Compile error: %v", err)
+	}
+
+	mustContain(t, src, "if req {")
+	mustContain(t, src, `" required"`)
+	mustContain(t, src, "if ro {")
+	mustContain(t, src, `" readonly"`)
 }

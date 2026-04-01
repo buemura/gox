@@ -37,7 +37,7 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	mu.Unlock()
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	views.TodoList(snapshot).Render(w)
+	views.TodoList(snapshot).Render(r.Context(), w)
 }
 
 func handleAdd(w http.ResponseWriter, r *http.Request) {

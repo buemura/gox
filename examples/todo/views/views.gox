@@ -23,11 +23,13 @@ func TodoItem(id int, text string, done bool) {
   <li class={{ todoItemClass(done) }}>
     <form method="POST" action="/toggle">
       <input type="hidden" name="id" value={{ strconv.Itoa(id) }} />
-      {{ if done }}
-        <button type="submit" class="text-lg">&#x2705;</button>
-      {{ else }}
-        <button type="submit" class="text-lg">&#x2B1C;</button>
-      {{ end }}
+      <button type="submit" class="flex items-center justify-center w-6 h-6 rounded-full border-2 cursor-pointer transition-colors hover:border-indigo-400" style={{ todoCheckStyle(done) }}>
+        {{ if done }}
+          <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        {{ end }}
+      </button>
     </form>
     <span class={{ todoTextClass(done) }}>{{ text }}</span>
     <form method="POST" action="/delete">
@@ -52,6 +54,13 @@ func TodoList(todos []Todo) {
           <TodoItem id={{ todo.ID }} text={{ todo.Text }} done={{ todo.Done }} />
         {{ end }}
       </ul>
+      <div class="mt-6 flex items-center justify-between text-sm text-gray-500 px-1">
+        <span>{{ strconv.Itoa(todoActiveCount(todos)) }} items left</span>
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" checked?={{ todoAllDone(todos) }} disabled class="w-4 h-4 rounded border-gray-300 text-indigo-600" />
+          <span>All complete</span>
+        </label>
+      </div>
     {{ end }}
   </Layout>
 }

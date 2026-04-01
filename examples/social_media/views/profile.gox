@@ -4,7 +4,7 @@ import "strconv"
 import "fmt"
 
 func ProfilePage(data ProfileData) {
-  <Layout title={{ data.ProfileUser.DisplayName + " (@" + data.ProfileUser.Username + ") / Gox Social" }} currentUser={{ data.CurrentUser }}>
+  <Layout title={{ data.ProfileUser.DisplayName + " (@" + data.ProfileUser.Username + ") / Gox Social" }}>
     <PageHeaderWithBack title={{ data.ProfileUser.DisplayName }} backURL="/" />
 
     <div class="h-[200px]" style={{ "background:linear-gradient(135deg, " + AvatarColor(data.ProfileUser.Username) + " 0%, #000 100%)" }}></div>
@@ -64,7 +64,7 @@ func ProfilePage(data ProfileData) {
       <EmptyState message="No posts yet." />
     {{ else }}
       {{ for _, post := range data.Posts }}
-        <PostCard post={{ post }} currentUser={{ data.CurrentUser }} />
+        <PostCard post={{ post }} />
       {{ end }}
     {{ end }}
   </Layout>

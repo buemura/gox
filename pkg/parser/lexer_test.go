@@ -583,3 +583,51 @@ func TestExpressionWithComplexGoCode(t *testing.T) {
 		{Type: TokenEOF},
 	})
 }
+
+func TestConditionalBooleanAttribute(t *testing.T) {
+	input := `package views
+
+func Button(isDisabled bool) {
+  <button disabled?={{ isDisabled }}>Submit</button>
+}`
+	assertTokens(t, input, []Token{
+		{Type: TokenPackageDecl, Value: "package views"},
+		{Type: TokenGoxDecl, Value: "func Button(isDisabled bool) {"},
+		{Type: TokenHTMLText},
+		{Type: TokenOpenTag, Value: "<button"},
+		{Type: TokenAttrName, Value: "disabled?="},
+		{Type: TokenExprOpen},
+		{Type: TokenGoCode, Value: "isDisabled"},
+		{Type: TokenExprClose},
+		{Type: TokenTagEnd},
+		{Type: TokenHTMLText, Value: "Submit"},
+		{Type: TokenCloseTag, Value: "</button>"},
+		{Type: TokenHTMLText, Value: "\n"},
+		{Type: TokenBraceClose},
+		{Type: TokenEOF},
+	})
+}
+
+func TestConditionalBooleanSelfClosing(t *testing.T) {
+	input := `package views
+
+func Form(checked bool) {
+  <input type="checkbox" checked?={{ checked }} />
+}`
+	assertTokens(t, input, []Token{
+		{Type: TokenPackageDecl, Value: "package views"},
+		{Type: TokenGoxDecl, Value: "func Form(checked bool) {"},
+		{Type: TokenHTMLText},
+		{Type: TokenOpenTag, Value: "<input"},
+		{Type: TokenAttrName, Value: "type="},
+		{Type: TokenAttrValue, Value: `"checkbox"`},
+		{Type: TokenAttrName, Value: "checked?="},
+		{Type: TokenExprOpen},
+		{Type: TokenGoCode, Value: "checked"},
+		{Type: TokenExprClose},
+		{Type: TokenSelfCloseTag},
+		{Type: TokenHTMLText, Value: "\n"},
+		{Type: TokenBraceClose},
+		{Type: TokenEOF},
+	})
+}

@@ -22,9 +22,8 @@ func handleFeed(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	views.FeedPage(views.FeedPageData{
-		CurrentUser: *user,
-		Posts:       posts,
-	}).Render(w)
+		Posts: posts,
+	}).Render(r.Context(), w)
 }
 
 func handleExplore(w http.ResponseWriter, r *http.Request) {
@@ -40,10 +39,9 @@ func handleExplore(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	views.ExplorePage(views.ExploreData{
-		CurrentUser:    *user,
 		Posts:          posts,
 		SuggestedUsers: suggested,
-	}).Render(w)
+	}).Render(r.Context(), w)
 }
 
 func handleCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -86,12 +84,11 @@ func handlePostDetail(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	views.PostDetailPage(views.PostDetailData{
-		CurrentUser: *user,
-		Post:        *post,
-		Thread:      thread,
-		Replies:     replies,
-		Comments:    comments,
-	}).Render(w)
+		Post:     *post,
+		Thread:   thread,
+		Replies:  replies,
+		Comments: comments,
+	}).Render(r.Context(), w)
 }
 
 func handleDeletePost(w http.ResponseWriter, r *http.Request) {
