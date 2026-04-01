@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.2 (2026-03-31)
+
+### Improvements
+
+- **Package documentation**: Added `doc.go` with comprehensive package-level documentation for [pkg.go.dev](https://pkg.go.dev/github.com/buemura/gox)
+- **Release workflow**: Go module proxy is now triggered automatically on release, ensuring new versions are immediately available via `go install`
+
+---
+
 ## v0.1.1 (2026-03-31)
 
 ### Features

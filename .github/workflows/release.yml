@@ -30,3 +30,7 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Go module proxy
+        run: |
+          GOPROXY=proxy.golang.org go list -m github.com/buemura/gox@${GITHUB_REF_NAME}
